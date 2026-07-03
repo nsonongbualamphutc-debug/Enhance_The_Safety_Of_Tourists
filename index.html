@@ -51,8 +51,12 @@ select.tb-btn option{color:var(--ink)}
 
 /* ================= HERO ================= */
 .hero{position:relative;overflow:hidden;color:#fff;
-  background:linear-gradient(180deg,rgba(9,33,28,.92) 0%,rgba(14,48,41,.86) 38%,rgba(20,74,62,.78) 70%,rgba(27,94,78,.72) 100%),
+  background:linear-gradient(100deg,rgba(9,33,28,.95) 0%,rgba(9,33,28,.88) 42%,rgba(12,44,38,.62) 68%,rgba(12,44,38,.45) 100%),
+    linear-gradient(180deg,rgba(9,33,28,.55) 0%,rgba(14,48,41,.42) 45%,rgba(20,74,62,.62) 100%),
     url("hero_bg.jpg") center 32%/cover no-repeat;background-color:#0B2A24}
+.hero h1,.hero .sub{text-shadow:0 2px 16px rgba(0,0,0,.55)}
+.hero .hm{background:rgba(9,33,28,.45);backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,.14)}
+.hero .verdict{background:rgba(9,33,28,.5);backdrop-filter:blur(4px)}
 .hero .photo-credit{position:absolute;right:14px;bottom:10px;z-index:3;font-size:.62rem;color:rgba(255,255,255,.55);letter-spacing:.05em}
 .hero::before{content:"";position:absolute;inset:0;
   background:radial-gradient(1200px 500px at 50% 118%,rgba(233,161,59,.35),transparent 62%);pointer-events:none}
@@ -235,7 +239,7 @@ body.tv #tvBar{display:block}
 #loader p{font-family:'Sarabun';font-size:.82rem;color:#BFD9CF;margin-top:6px}
 #loader .dots i{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--gold);margin:0 3px;animation:bounce 1.2s infinite}
 #loader .dots i:nth-child(2){animation-delay:.15s}#loader .dots i:nth-child(3){animation-delay:.3s}
-#loader .mtn{position:absolute;bottom:0;left:0;right:0;height:120px;opacity:.5}
+#loader .mtn{position:absolute;bottom:0;left:0;width:100%;height:120px;opacity:.5}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.045)}}
 @keyframes bounce{0%,100%{transform:translateY(0);opacity:.5}50%{transform:translateY(-7px);opacity:1}}
@@ -440,7 +444,7 @@ tr.clickable:hover td{background:#EFF6F2!important}
   </div>
   <div class="grid2b">
     <div class="card">
-      <h3 class="disp" style="color:var(--deep);font-weight:600;margin-bottom:10px">เดือนนี้ ใครนำ ใครต้องเร่ง</h3>
+      <h3 class="disp" style="color:var(--deep);font-weight:600;margin-bottom:2px">จัดอันดับ 12 จุด • ใครนำ ใครต้องเร่ง</h3><div style="font-size:.7rem;color:var(--mut);margin-bottom:10px">ความคืบหน้าสะสมทั้งห้วงเทียบเป้ารายจุด • คลิกเพื่อดูรายละเอียด</div>
       <div id="raceList"></div>
     </div>
     <div class="card">
@@ -594,7 +598,7 @@ const fmt=n=>Number(n).toLocaleString("th-TH");
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const AMPS={"3901":"เมืองหนองบัวลำภู","3902":"นากลาง","3903":"โนนสัง","3904":"ศรีบุญเรือง","3905":"สุวรรณคูหา","3906":"นาวัง"};
 
-function jsonp(params){
+function jsonpOnce(params,timeoutMs){
   return new Promise((res,rej)=>{
     if(!GAS_URL){ res(DEMO); return; }
     const cb="cb"+Date.now()+Math.floor(Math.random()*999);
@@ -604,9 +608,20 @@ function jsonp(params){
     s.src=GAS_URL+"?"+q;
     s.onerror=()=>{ delete window[cb]; s.remove(); rej(new Error("เชื่อมต่อไม่สำเร็จ")); };
     document.body.appendChild(s);
-    setTimeout(()=>{ if(window[cb]){ delete window[cb]; s.remove(); rej(new Error("หมดเวลาเชื่อมต่อ")); } },30000);
+    setTimeout(()=>{ if(window[cb]){ delete window[cb]; s.remove(); rej(new Error("หมดเวลาเชื่อมต่อ")); } },timeoutMs||45000);
   });
 }
+/* อ่านข้อมูล (getData/verifyPin/ping) retry อัตโนมัติ 1 ครั้ง — เขียนข้อมูลไม่ retry กันบันทึกซ้ำ */
+const READ_ACTIONS={getData:1,verifyPin:1,ping:1};
+async function jsonp(params){
+  try{ return await jsonpOnce(params,45000); }
+  catch(e){
+    if(READ_ACTIONS[params.action]){ return await jsonpOnce(params,45000); }
+    throw e;
+  }
+}
+/* ปลุกเซิร์ฟเวอร์ล่วงหน้า (Apps Script cold start 5–15 วิ) */
+if(GAS_URL){ jsonpOnce({action:"ping"},20000).catch(()=>{}); }
 
 /* pace: สัดส่วนเวลาในห้วงที่ผ่านไปแล้ว */
 function paceRatio(){
@@ -624,7 +639,9 @@ function statusOf(pct,pace){
   return {t:"ต้องเร่งรัด",c:"var(--bad)",cls:"c-bad"};
 }
 /* จำแนกคำตอบมาตรการเป็น ok / warn / bad / na */
+const scamFound=s=>!!s&&String(s).trim().indexOf("พบเหตุการณ์")===0; // "ไม่พบเหตุการณ์" ต้องไม่ถูกนับ
 function grade(v,measure){
+  v=v==null?"":String(v).trim();
   if(!v) return {g:"na",short:"ยังไม่รายงาน"};
   if(measure==="lifeguard"&&v.indexOf("ไม่ใช่แหล่งท่องเที่ยวทางน้ำ")>-1) return {g:"na",short:"ไม่เกี่ยวข้อง"};
   if(v.indexOf("100%")>-1||v.indexOf("เรียบร้อย")>-1||v.indexOf("ครบถ้วนและเพียงพอ")>-1||v==="ไม่พบเหตุการณ์") return {g:"ok",short:shortLbl(v)};
@@ -656,7 +673,7 @@ function renderAll(){
   $("hmMonthLb").textContent=month==="ALL"?"เดือนปัจจุบัน (ครั้ง)":"รอบเดือนที่เลือก (ครั้ง)";
   const passCnt=CPS.filter(c=>{const p=sumPatrols("ALL",c.id)/c.target*100;return p>=pace*100||p>=100;}).length;
   $("hmPass").textContent=passCnt+"/12";
-  const scamOpen=CPS.filter(c=>{const m=DATA.measures[c.id];return m&&m.scam&&m.scam.indexOf("พบเหตุการณ์")>-1;}).length;
+  const scamOpen=CPS.filter(c=>scamFound((DATA.measures[c.id]||{}).scam)).length;
   $("hmScam").textContent=scamOpen;
   $("vTitle").textContent=`ผลตรวจสะสม ${fmt(cum)} ครั้ง (${pct.toFixed(1)}%) — ${st.t}`;
   $("vSub").textContent=`เวลาผ่านไป ${(pace*100).toFixed(0)}% ของห้วง ${PERIOD.label} • เป้าหมายรวม ${fmt(TOTAL_TARGET)} ครั้ง`;
@@ -884,7 +901,7 @@ window.openDd=function(cpId){
   const recs=DATA.patrols.filter(x=>x.cp===c.id).sort((a,b)=>String(b.date+(b.id||"")).localeCompare(a.date+(a.id||"")));
   const nMonths={};recs.forEach(r=>{nMonths[r.month]=(nMonths[r.month]||0)+Number(r.count||0);});
   const moRows=Object.keys(nMonths).sort().map(k=>`<span class="mchip" style="background:#EAF3EF;color:var(--teal)">${monthLabel(k)}: <b>${fmt(nMonths[k])}</b> ครั้ง</span>`).join(" ")||'<span style="color:var(--mut);font-size:.76rem">ยังไม่มีการบันทึกผลตรวจ</span>';
-  const scamBox=(m.scam&&m.scam.indexOf("พบเหตุการณ์")>-1)
+  const scamBox=scamFound(m.scam)
     ?`<h4>⚠️ เหตุมิจฉาชีพ/หลอกลวงนักท่องเที่ยว (มาตรการ 4)</h4>
        <div class="dd-scam"><b style="font-family:Kanit">สถานะ: พบเหตุการณ์ — อยู่ระหว่างติดตาม</b><br>${(m.scamDetail||"ไม่ได้ระบุรายละเอียด").replace(/</g,"&lt;")}</div>`
     :`<h4>⚠️ เหตุมิจฉาชีพ/หลอกลวง (มาตรการ 4)</h4>
@@ -936,17 +953,35 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape")closeDd();});
 function hideLoader(){const l=$("loader");if(l)l.classList.add("off");}
 
 /* ════════════════════ LOAD ════════════════════ */
-async function load(){
+let painted=false;
+function paintFromLocalCache(){
   try{
-    DATA=await jsonp({action:"getData"});
-    if(!DATA.ok) throw new Error(DATA.error||"ข้อมูลไม่ถูกต้อง");
+    const raw=localStorage.getItem("ts_data_v1"); if(!raw) return;
+    const c=JSON.parse(raw); if(!c||!c.ok) return;
+    DATA=c; renderAll(); hideLoader(); painted=true;
+    $("lastUpdate").innerHTML=`<i style="background:var(--gold)"></i>แสดงข้อมูลล่าสุดที่บันทึกไว้ • กำลังอัปเดต…`;
+  }catch(e){}
+}
+async function load(){
+  const slow=setTimeout(()=>{const p=document.querySelector("#loader p");
+    if(p)p.textContent="เซิร์ฟเวอร์กำลังเริ่มทำงาน ครั้งแรกอาจใช้เวลา 10–20 วินาที…";},5000);
+  try{
+    const fresh=await jsonp({action:"getData"});
+    if(!fresh.ok) throw new Error(fresh.error||"ข้อมูลไม่ถูกต้อง");
+    DATA=fresh;
+    try{ localStorage.setItem("ts_data_v1",JSON.stringify(fresh)); }catch(e){}
     $("lastUpdate").innerHTML=`<i></i>อัปเดตล่าสุด: ${DATA.serverTime}`;
     renderAll(); hideLoader();
   }catch(e){
-    $("lastUpdate").innerHTML=`<i style="background:var(--bad)"></i>${e.message} — แสดงข้อมูลสาธิต`;
-    DATA=DEMO; renderAll(); hideLoader();
+    if(painted){ $("lastUpdate").innerHTML=`<i style="background:var(--gold)"></i>แสดงข้อมูลล่าสุดที่บันทึกไว้ (เชื่อมต่อสดไม่สำเร็จ)`; }
+    else{
+      $("lastUpdate").innerHTML=`<i style="background:var(--bad)"></i>${e.message} — แสดงข้อมูลสาธิต`;
+      DATA=DEMO; renderAll(); hideLoader();
+    }
   }
+  clearTimeout(slow);
 }
+paintFromLocalCache();
 $("monthSel").addEventListener("change",renderAll);
 
 /* clock */

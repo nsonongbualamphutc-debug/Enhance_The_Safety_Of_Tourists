@@ -285,7 +285,7 @@ async function sha256(str){
   const buf=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(str));
   return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,"0")).join("");
 }
-function jsonp(params){
+function jsonpOnce(params,timeoutMs){
   return new Promise((res,rej)=>{
     if(!GAS_URL){ res(demoServer(params)); return; }
     const cb="cb"+Date.now()+Math.floor(Math.random()*999);
@@ -294,9 +294,19 @@ function jsonp(params){
     const s=document.createElement("script"); s.src=GAS_URL+"?"+q;
     s.onerror=()=>{delete window[cb];s.remove();rej(new Error("เชื่อมต่อไม่สำเร็จ"));};
     document.body.appendChild(s);
-    setTimeout(()=>{if(window[cb]){delete window[cb];s.remove();rej(new Error("หมดเวลาเชื่อมต่อ"));}},30000);
+    setTimeout(()=>{if(window[cb]){delete window[cb];s.remove();rej(new Error("หมดเวลาเชื่อมต่อ"));}},timeoutMs||45000);
   });
 }
+const READ_ACTIONS={getData:1,verifyPin:1,ping:1};
+async function jsonp(params){
+  try{ return await jsonpOnce(params,45000); }
+  catch(e){
+    if(READ_ACTIONS[params.action]){ return await jsonpOnce(params,45000); }
+    throw e;
+  }
+}
+/* ปลุกเซิร์ฟเวอร์ทันทีที่เปิดหน้า — ระหว่างผู้ใช้พิมพ์รหัส เซิร์ฟเวอร์จะพร้อมแล้ว */
+if(GAS_URL){ jsonpOnce({action:"ping"},20000).catch(()=>{}); }
 /* โหมดสาธิต — จำลองเซิร์ฟเวอร์ในหน่วยความจำ (รีเฟรชแล้วหาย) */
 const demoDB={patrols:[],measures:{}};
 function demoServer(p){
@@ -320,6 +330,8 @@ async function doLogin(){
   const pin=$("pinInput").value.trim();
   if(pin.length<4){$("loginErr").textContent="กรอกรหัสให้ครบ";return;}
   $("btnLogin").disabled=true;$("loginErr").textContent="";
+  $("btnLogin").textContent="กำลังตรวจสอบ…";
+  const slow=setTimeout(()=>{$("loginErr").style.color="var(--mut)";$("loginErr").textContent="เซิร์ฟเวอร์กำลังเริ่มทำงาน ครั้งแรกอาจใช้เวลา 10–20 วินาที…";},4000);
   try{
     HASH=await sha256(pin);
     const r=await jsonp({action:"verifyPin",hash:HASH});
@@ -327,7 +339,9 @@ async function doLogin(){
     ROLE=r.role;
     sessionStorage.setItem("ts_hash",HASH);sessionStorage.setItem("ts_role",ROLE);
     enter();
-  }catch(e){$("loginErr").textContent=e.message;}
+  }catch(e){$("loginErr").style.color="var(--bad)";$("loginErr").textContent=e.message+" — ลองกดเข้าสู่ระบบอีกครั้ง";}
+  clearTimeout(slow);
+  $("btnLogin").textContent="เข้าสู่ระบบ";
   $("btnLogin").disabled=false;
 }
 function enter(){
@@ -383,14 +397,15 @@ $("btnSaveP").onclick=async()=>{
 };
 
 /* ── มาตรการ: โหลดค่าล่าสุด + บันทึกทับ ── */
+const scamFound=s=>!!s&&String(s).trim().indexOf("พบเหตุการณ์")===0;
 function loadMeasureForm(){
   const m=(CACHE&&CACHE.measures&&CACHE.measures[$("mCp").value])||{};
   $("mCctv").value=m.cctv||"";$("mSigns").value=m.signs||"";$("mLife").value=m.lifeguard||"";
   $("mDrill").value=m.drill||"";$("mScam").value=m.scam||"";$("mScamDetail").value=m.scamDetail||"";
-  $("scamWrap").hidden=!(m.scam&&m.scam.indexOf("พบเหตุการณ์")>-1);
+  $("scamWrap").hidden=!scamFound(m.scam);
   $("mUpdated").textContent=m.updated?`อัปเดตล่าสุด: ${m.updated}${m.by?" โดย "+m.by:""}`:"ยังไม่เคยรายงานสถานะจุดนี้";
 }
-$("mScam").addEventListener("change",()=>{$("scamWrap").hidden=$("mScam").value.indexOf("พบเหตุการณ์")===-1;});
+$("mScam").addEventListener("change",()=>{$("scamWrap").hidden=!scamFound($("mScam").value);});
 $("btnSaveM").onclick=async()=>{
   $("btnSaveM").disabled=true;
   try{
