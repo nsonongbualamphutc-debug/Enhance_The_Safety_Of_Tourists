@@ -98,7 +98,9 @@ section{padding:44px 0 8px}
 .sec-head p{color:var(--mut);font-size:.9rem;flex-basis:100%}
 
 /* KPI */
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+@media(max-width:1100px){.kpis{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.kpis{grid-template-columns:1fr}}
 .kpi{background:var(--card);border-radius:var(--r);padding:18px 18px 16px;box-shadow:var(--shadow);
   border-top:4px solid var(--teal);position:relative;overflow:hidden}
 .kpi.gold{border-top-color:var(--gold)} .kpi.rose{border-top-color:var(--lotus)} .kpi.bad{border-top-color:var(--bad)}
@@ -120,7 +122,7 @@ section{padding:44px 0 8px}
 .cp-pin{display:flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50% 50% 50% 4px;
   transform:rotate(-45deg);box-shadow:0 4px 12px rgba(0,0,0,.35);border:2.5px solid #fff}
 .cp-pin span{transform:rotate(45deg);font-size:17px;line-height:1}
-.popcard{width:270px;font-family:'Sarabun'}
+.popcard{width:270px;font-family:'Sarabun';word-break:normal;overflow-wrap:break-word;line-break:normal}
 .popcard .cover{height:88px;border-radius:10px;display:flex;align-items:flex-end;padding:8px 12px;color:#fff;position:relative;overflow:hidden}
 .popcard .cover .em{position:absolute;right:8px;top:2px;font-size:3.1rem;opacity:.35}
 .popcard .cover b{font-family:'Kanit';font-size:.98rem;font-weight:600;text-shadow:0 2px 8px rgba(0,0,0,.45);position:relative}
@@ -128,15 +130,17 @@ section{padding:44px 0 8px}
 .popcard .amp{font-size:.74rem;color:var(--mut)}
 .popcard .bar{height:8px;background:#EDEAE0;border-radius:99px;margin:8px 0 4px;overflow:hidden}
 .popcard .bar i{display:block;height:100%;border-radius:99px}
-.popcard .nums{display:flex;justify-content:space-between;font-size:.78rem;color:var(--mut)}
+.popcard .nums{display:flex;justify-content:space-between;gap:8px;font-size:.76rem;color:var(--mut);white-space:nowrap}
 .popcard .nums b{color:var(--deep);font-family:'Kanit'}
 .popcard .chips{display:flex;gap:5px;flex-wrap:wrap;margin:9px 0}
-.mchip{font-size:.66rem;padding:3px 8px;border-radius:99px;font-weight:600}
+.mchip{font-size:.66rem;padding:3px 9px;border-radius:99px;font-weight:600;white-space:nowrap;display:inline-flex;align-items:center;gap:3px}
 .popcard .acts{display:flex;gap:7px;margin-top:8px}
 .popcard .acts a{flex:1;text-align:center;font-family:'Kanit';font-size:.76rem;font-weight:500;text-decoration:none;
   border-radius:9px;padding:8px 4px;transition:.15s}
 .a-nav{background:var(--deep);color:#fff}.a-nav:hover{background:var(--teal)}
 .a-food{background:#FBEEDB;color:#8A5A12;border:1px solid #F0D9AE}.a-food:hover{background:var(--gold);color:#fff}
+.leaflet-popup-content{margin:12px 14px;line-height:1.5}
+.leaflet-popup-content-wrapper{border-radius:14px;box-shadow:0 12px 40px rgba(11,42,36,.28)}
 .legend{position:absolute;bottom:18px;left:14px;z-index:900;background:rgba(255,255,255,.94);border-radius:12px;
   padding:10px 14px;font-size:.74rem;box-shadow:var(--shadow)}
 .legend b{font-family:'Kanit';font-size:.78rem;color:var(--deep);display:block;margin-bottom:6px}
@@ -166,22 +170,24 @@ section{padding:44px 0 8px}
 
 /* charts */
 .chartbox{position:relative;height:330px}
-.chartbox.tall{height:420px}
+.chartbox.tall{height:460px}
 .don-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
 .don{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:16px;text-align:center}
 .don h3{font-size:.86rem;font-weight:500;color:var(--deep);margin-bottom:8px;min-height:2.4em;display:flex;align-items:center;justify-content:center}
-.don .cv{position:relative;height:170px}
+.don .cv{position:relative;height:168px;max-width:200px;margin:0 auto}
 .don .mid{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
-.don .mid b{font-family:'Kanit';font-size:1.5rem;color:var(--deep)}
-.don .mid span{font-size:.64rem;color:var(--mut)}
+.don .mid b{font-family:'Kanit';font-size:1.5rem;color:var(--deep);line-height:1.1}
+.don .mid span{font-size:.64rem;color:var(--mut);margin-top:1px}
 
 /* matrix */
-table.matrix{width:100%;border-collapse:collapse;font-size:.83rem}
-.matrix th{background:var(--deep);color:#fff;font-family:'Kanit';font-weight:500;font-size:.76rem;padding:11px 10px;text-align:center;position:sticky;top:66px}
+table.matrix{width:100%;min-width:920px;border-collapse:separate;border-spacing:0;font-size:.83rem}
+.matrix th{background:var(--deep);color:#fff;font-family:'Kanit';font-weight:500;font-size:.76rem;padding:12px 10px;text-align:center;white-space:nowrap}
 .matrix th:first-child{text-align:left;border-radius:10px 0 0 0}.matrix th:last-child{border-radius:0 10px 0 0}
-.matrix td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:center;vertical-align:middle}
+.matrix td{padding:11px 10px;border-bottom:1px solid var(--line);text-align:center;vertical-align:middle}
 .matrix td.nm{text-align:left}
-.matrix tr:nth-child(even) td{background:#FBFAF4}
+.matrix tbody tr:nth-child(odd) td{background:#FBFAF4}
+.matrix tbody tr:first-child td{padding-top:13px}
+.matrix tbody tr:hover td{background:#EFF6F2}
 .matrix .cpn{font-family:'Kanit';font-weight:600;color:var(--deep);font-size:.84rem}
 .matrix .ampx{font-size:.7rem;color:var(--mut)}
 .chip{display:inline-block;padding:4px 11px;border-radius:99px;font-size:.7rem;font-weight:700;white-space:nowrap}
@@ -191,12 +197,14 @@ table.matrix{width:100%;border-collapse:collapse;font-size:.83rem}
 
 /* hotline strip */
 .hotline{margin:46px 0 0;background:linear-gradient(120deg,var(--deep) 0%,var(--teal) 100%);border-radius:var(--r);
-  color:#fff;padding:24px 26px;display:flex;gap:26px;align-items:center;flex-wrap:wrap;box-shadow:var(--shadow)}
+  color:#fff;padding:24px 26px;display:grid;grid-template-columns:minmax(240px,1fr) repeat(4,minmax(180px,1.15fr));gap:16px;align-items:center;box-shadow:var(--shadow)}
+@media(max-width:1180px){.hotline{grid-template-columns:1fr 1fr}.hotline .big{grid-column:1/-1}}
+@media(max-width:560px){.hotline{grid-template-columns:1fr}}
 .hotline .big{font-family:'Kanit';font-weight:700;font-size:1.2rem}
 .hotline .big span{display:block;font-weight:300;font-size:.8rem;color:#BFD9CF}
-.hl-item{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:12px;padding:10px 18px}
-.hl-item b{font-family:'Kanit';font-size:1.3rem;color:var(--gold-soft)}
-.hl-item span{font-size:.76rem;color:#DCEDE5}
+.hl-item{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:12px;padding:12px 16px;height:100%}
+.hl-item b{font-family:'Kanit';font-size:1.2rem;color:var(--gold-soft);white-space:nowrap;letter-spacing:-.01em}
+.hl-item span{font-size:.74rem;color:#DCEDE5;line-height:1.4}
 
 footer{margin-top:46px;padding:26px 24px 34px;background:var(--deep2);color:#9DBFB2;font-size:.8rem;text-align:center;line-height:1.9}
 footer b{color:#fff;font-family:'Kanit';font-weight:500}
@@ -458,7 +466,10 @@ tr.clickable:hover td{background:#EFF6F2!important}
   <div class="sec-head">
     <span class="tag">4 Measures Tracking</span>
     <h2>สถานะความพร้อมตามมาตรการ</h2>
-    <p>ข้อมูลสถานะล่าสุดจากเจ้าหน้าที่ประจำจุดตรวจ (เรียลไทม์) — 🔍 <b>คลิกที่แถวจุดตรวจใดก็ได้</b>เพื่อเปิดรายละเอียดเชิงลึก: ผลตรวจรายเดือน สถานะทุกมาตรการ รายละเอียดเหตุมิจฉาชีพ และบันทึกย้อนหลังทุกรายการ</p>
+    <p id="measureCap">ข้อมูลสถานะล่าสุดจากเจ้าหน้าที่ประจำจุดตรวจ (เรียลไทม์) — 🔍 <b>คลิกที่แถวจุดตรวจใดก็ได้</b>เพื่อเปิดรายละเอียดเชิงลึก: ผลตรวจรายเดือน สถานะทุกมาตรการ รายละเอียดเหตุมิจฉาชีพ และบันทึกย้อนหลังทุกรายการ</p>
+<div id="measureEmpty" style="display:none;background:#FDF6E7;border:1px solid #EFDDB4;border-radius:12px;padding:11px 16px;margin-top:10px;font-size:.8rem;color:#8A5A12">
+  ⏳ <b style="font-family:Kanit">อยู่ระหว่างรวบรวมรายงานสถานะจากเจ้าหน้าที่ประจำจุดตรวจทั้ง 12 จุด</b> — เจ้าหน้าที่บันทึกผ่านระบบกรอกข้อมูลได้ตลอดเวลา สถานะจะปรากฏบนแดชบอร์ดทันที
+</div>
   </div>
   <div class="don-grid" id="donGrid">
     <div class="don"><h3>📹 CCTV / ไฟส่องสว่าง 24 ชม.<br>(มาตรการ 1.2)</h3><div class="cv"><canvas id="d1"></canvas><div class="mid"><b id="d1v">–</b><span>จาก 12 จุด</span></div></div></div>
@@ -487,7 +498,7 @@ tr.clickable:hover td{background:#EFF6F2!important}
 <div class="hotline" id="sec-hotline">
   <div class="big">พบเหตุ แจ้งได้ทันที<span>มาตรการ 4.2 ประชาสัมพันธ์ช่องทางร้องเรียนและขอความช่วยเหลือ</span></div>
   <div class="hl-item"><b>1155</b><span>สายด่วนตำรวจท่องเที่ยว<br>Tourist Police Hotline</span></div>
-  <div class="hl-item"><b>02-134-4077</b><span>สายด่วนช่วยเหลือนักท่องเที่ยว<br>Tourist Assistance Center</span></div>
+  <div class="hl-item"><b style="font-size:1.02rem">02-134-4077</b><span>สายด่วนช่วยเหลือนักท่องเที่ยว<br>Tourist Assistance Center</span></div>
   <div class="hl-item"><b>1669</b><span>เจ็บป่วยฉุกเฉิน<br>Emergency Medical</span></div>
   <div class="hl-item"><b>191</b><span>เหตุด่วนเหตุร้าย<br>Police</span></div>
 </div>
@@ -693,14 +704,22 @@ function renderAll(){
   $("kPatrolSub").textContent=month==="ALL"?`เป้าหมายรวม ${fmt(TOTAL_TARGET)} ครั้ง`:`เฉพาะรอบ ${monthLabel(month)} • เป้าเฉลี่ย/เดือน ${fmt(TOTAL_TARGET/4)} ครั้ง`;
   $("kPct").innerHTML=pct.toFixed(1)+"<small>%</small>";
   $("kPaceSub").textContent=`${st.t} (เวลาแผนผ่านไป ${(pace*100).toFixed(0)}%)`;
+  $("kPaceSub").style.color=st.c;
   $("kPass").innerHTML=passCnt+"<small>/12</small>";
-  $("kPassSub").textContent=passCnt>=9?"ภาพรวมเดินหน้าตามแผน":"มีจุดตรวจต้องเร่งรัด "+(12-passCnt)+" จุด";
+  const passSub=$("kPassSub");
+  passSub.textContent=passCnt>=9?"ภาพรวมเดินหน้าตามแผน":passCnt>0?"มีจุดตรวจต้องเร่งรัด "+(12-passCnt)+" จุด":"อยู่ระหว่างเร่งรัดการบันทึกผลจากพื้นที่";
+  passSub.style.color=passCnt>=9?"var(--ok)":passCnt>=6?"var(--warn)":"var(--bad)";
+  /* การ์ดเหตุมิจฉาชีพ: ไม่มีเหตุ = โทนบวก */
+  const scamCard=$("kScamCard");
+  scamCard.querySelector(".ic").textContent=scamOpen>0?"⚠️":"✅";
+  scamCard.querySelector(".sub2").textContent=scamOpen>0?"มาตรการที่ 4 — อยู่ระหว่างติดตาม":"มาตรการที่ 4 — ไม่มีเหตุคงค้าง";
+  scamCard.querySelector(".sub2").style.color=scamOpen>0?"var(--bad)":"var(--ok)";
   const pctOf=(m,ok)=>Math.round(CPS.filter(c=>{const x=DATA.measures[c.id];return x&&grade(x[m],m).g==="ok";}).length/12*100);
   $("kCctv").innerHTML=pctOf("cctv")+"<small>%</small>";
   $("kSign").innerHTML=pctOf("signs")+"<small>%</small>";
   $("kDrill").innerHTML=pctOf("drill")+"<small>%</small>";
   $("kScam").textContent=scamOpen;
-  $("kScamCard").className="kpi "+(scamOpen>0?"bad":"rose");
+  $("kScamCard").className="kpi "+(scamOpen>0?"bad":"");
 
   $("cpChartCap").textContent=month==="ALL"?`สะสมทั้งห้วง ${PERIOD.label}`:`เฉพาะรอบ ${monthLabel(month)} เทียบเป้าเฉลี่ยรายเดือน`;
 
@@ -764,7 +783,7 @@ function renderMap(month,pace){
         <div class="bar"><i style="width:${clamp(p,0,100)}%;background:${st.c}"></i></div>
         <div class="nums"><span>ผลตรวจสะสม <b>${fmt(got)}</b> ครั้ง</span><span>เป้า <b>${fmt(c.target)}</b> (${p.toFixed(0)}%)</span></div>
         <div class="chips">${chips}</div>
-        <div style="font-size:.76rem;color:var(--mut);line-height:1.55">${c.desc}</div>
+        <div style="font-size:.75rem;color:#54635D;line-height:1.6;margin-top:2px">${c.desc}</div>
         <div class="acts">
           <a class="a-nav" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=${c.lat},${c.lng}">🧭 นำทาง</a>
           <a class="a-food" target="_blank" rel="noopener" href="https://www.google.com/maps/search/ร้านอาหาร/@${c.lat},${c.lng},15z">🍜 ร้านใกล้เคียง</a>
@@ -811,15 +830,19 @@ function renderCpChart(month,pace){
   const tgs=CPS.map(c=>month==="ALL"?c.target:Math.round(c.target/4));
   const cols=CPS.map((c,i)=>{const p=vals[i]/tgs[i]*100;return statusOf(p,month==="ALL"?pace:1).c;});
   charts.cp&&charts.cp.destroy();
+  const maxTg=Math.max(...tgs,1);
   charts.cp=new Chart($("cpChart"),{type:"bar",
     data:{labels,datasets:[
-      {label:"ผลตรวจ (ครั้ง)",data:vals,backgroundColor:cols,borderRadius:6,barPercentage:.72},
-      {label:"เป้าหมาย",data:tgs,type:"bar",backgroundColor:"rgba(18,60,51,.10)",borderColor:"rgba(18,60,51,.35)",borderWidth:1,borderRadius:6,barPercentage:.95,grouped:false,order:2}
+      {label:"เป้าหมาย",data:tgs,backgroundColor:"rgba(18,60,51,.07)",borderColor:"rgba(18,60,51,.2)",borderWidth:1,borderRadius:5,barPercentage:.9,categoryPercentage:.82,order:2},
+      {label:"ผลตรวจ (ครั้ง)",data:vals,backgroundColor:cols,borderRadius:5,barPercentage:.56,categoryPercentage:.82,order:1}
     ]},
     options:{indexAxis:"y",responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{position:"bottom",labels:{boxWidth:12,font:{size:11}}},
+      layout:{padding:{right:14,top:2,bottom:2}},
+      plugins:{legend:{position:"bottom",labels:{boxWidth:12,font:{size:11},padding:14}},
         tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: ${fmt(ctx.raw)} ครั้ง`}}},
-      scales:{x:{grid:{color:"#EDEAE0"}},y:{grid:{display:false},ticks:{font:{size:10.5}}}}}});
+      scales:{
+        x:{grid:{color:"#EDEAE0"},suggestedMax:Math.ceil(maxTg*1.05),ticks:{font:{size:10.5}}},
+        y:{grid:{display:false},ticks:{font:{size:10.5},autoSkip:false,crossAlign:"far"}}}}});
 }
 
 function renderMonthChart(){
@@ -858,17 +881,30 @@ function renderRace(pace){
 function renderDonuts(){
   const defs=[["d1","cctv"],["d2","signs"],["d3","lifeguard"],["d4","drill"]];
   defs.forEach(([id,key])=>{
-    let ok=0,warn=0,bad=0,na=0;
-    CPS.forEach(c=>{const g=grade((DATA.measures[c.id]||{})[key],key).g;
+    let ok=0,warn=0,bad=0,na=0,noRep=0;
+    CPS.forEach(c=>{
+      const v=(DATA.measures[c.id]||{})[key];
+      if(!v||!String(v).trim())noRep++;
+      const g=grade(v,key).g;
       if(g==="ok")ok++;else if(g==="warn")warn++;else if(g==="na")na++;else bad++;});
-    $(id+"v").textContent=ok;
+    const allEmpty=noRep===12;
+    const vEl=$(id+"v"), sEl=vEl.nextElementSibling;
+    if(allEmpty){
+      vEl.textContent="รอรายงาน"; vEl.style.fontSize=".82rem"; vEl.style.color="var(--mut)";
+      if(sEl)sEl.textContent="จากพื้นที่ 12 จุด";
+    }else{
+      vEl.textContent=ok; vEl.style.fontSize=""; vEl.style.color="";
+      if(sEl)sEl.textContent=`พร้อม จาก 12 จุด`;
+    }
     charts[id]&&charts[id].destroy();
     charts[id]=new Chart($(id),{type:"doughnut",
       data:{labels:["เรียบร้อย/พร้อม","ระหว่างดำเนินการ","ยังไม่ดำเนินการ/ไม่มี","ไม่เกี่ยวข้อง/ไม่รายงาน"],
-        datasets:[{data:[ok,warn,bad,na],backgroundColor:["#2E8B57","#E9A13B","#D64545","#C9D2CD"],borderWidth:2,borderColor:"#fff"}]},
+        datasets:[{data:[ok,warn,bad,na],backgroundColor:["#2E8B57","#E9A13B","#D64545",allEmpty?"#E7E4D8":"#C9D2CD"],borderWidth:2,borderColor:"#fff"}]},
       options:{cutout:"68%",plugins:{legend:{display:false},
         tooltip:{callbacks:{label:c=>` ${c.label}: ${c.raw} จุด`}}}}});
   });
+  const anyReport=CPS.some(c=>{const m=DATA.measures[c.id]||{};return ["cctv","signs","lifeguard","drill","scam"].some(k=>m[k]&&String(m[k]).trim());});
+  const be=$("measureEmpty"); if(be) be.style.display=anyReport?"none":"block";
 }
 
 function renderMatrix(pace){
@@ -880,8 +916,10 @@ function renderMatrix(pace){
       const tip=(k==="scam"&&m.scamDetail)?` title="${m.scamDetail.replace(/"/g,"'")}"`:"";
       return `<td><span class="chip ${cls}"${tip}>${g.short}</span></td>`;};
     return `<tr class="clickable" onclick="openDd('${c.id}')" title="คลิกดูรายละเอียดเชิงลึก">
-      <td class="nm"><span class="cpn">${c.em} จุดตรวจที่ ${c.no} ${c.name}</span><div class="ampx">อ.${c.amp}${m.updated?` • อัปเดต ${m.updated}`:""} • 🔍 คลิกดูรายละเอียด</div></td>
-      <td><span class="chip ${st.cls}">${fmt(got)} / ${fmt(c.target)} (${p.toFixed(0)}%)</span></td>
+      <td class="nm"><span class="cpn">${c.em} จุดตรวจที่ ${c.no} ${c.name}</span><div class="ampx">อ.${c.amp}${m.updated?` • อัปเดตล่าสุด ${m.updated}`:""}</div></td>
+      <td>${got>0
+        ?`<span class="chip ${st.cls}">${fmt(got)} / ${fmt(c.target)} (${p.toFixed(0)}%)</span>`
+        :`<span class="chip c-na">0 / ${fmt(c.target)} • รอเริ่มบันทึก</span>`}</td>
       ${cell(m.cctv,"cctv")}${cell(m.signs,"signs")}${cell(m.lifeguard,"lifeguard")}${cell(m.drill,"drill")}${cell(m.scam,"scam")}
     </tr>`;}).join("");
 }
