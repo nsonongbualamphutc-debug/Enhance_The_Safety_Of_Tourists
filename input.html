@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ระบบกรอกข้อมูล | ความปลอดภัยนักท่องเที่ยว จ.หนองบัวลำภู</title>
+<meta name="theme-color" content="#123C33">
+<link rel="icon" href="ตราหนองบัวลำภู.png">
+<link rel="manifest" href="manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{--deep:#123C33;--deep2:#0B2A24;--teal:#1B6B5A;--gold:#E9A13B;--gold2:#F5C877;
+--paper:#F5F2E9;--card:#fff;--ink:#1E2B27;--mut:#5E6F69;--line:#E3DFD2;
+--ok:#2E8B57;--warn:#E9A13B;--bad:#D64545;--shadow:0 10px 30px rgba(18,60,51,.10);--r:16px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Sarabun',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh}
+h1,h2,h3{font-family:'Kanit'}
+.topbar{position:sticky;top:0;z-index:100;background:var(--deep);color:#fff;display:flex;align-items:center;gap:12px;padding:10px 20px;box-shadow:0 2px 12px rgba(0,0,0,.2)}
+.topbar img{width:40px;height:40px;object-fit:contain}
+.topbar b{font-family:'Kanit';font-weight:600;font-size:1rem}
+.topbar span{display:block;font-size:.7rem;color:#BFD9CF}
+.sp{flex:1}
+.who{font-size:.78rem;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:99px;padding:5px 14px}
+.who b{color:var(--gold2);font-family:'Kanit'}
+.tbtn{border:1px solid rgba(255,255,255,.3);background:transparent;color:#fff;border-radius:9px;padding:7px 13px;font-family:'Kanit';font-size:.8rem;cursor:pointer}
+.tbtn:hover{background:var(--gold);border-color:var(--gold);color:var(--deep2)}
+.wrap{max-width:1060px;margin:0 auto;padding:24px 18px 60px}
+
+/* login */
+.login{max-width:420px;margin:8vh auto;background:var(--card);border-radius:20px;box-shadow:var(--shadow);padding:36px 34px;text-align:center}
+.login img{width:88px;margin-bottom:12px}
+.login h1{font-size:1.25rem;color:var(--deep);font-weight:600}
+.login p{font-size:.82rem;color:var(--mut);margin:8px 0 22px;line-height:1.6}
+.pin{width:100%;font-family:'Kanit';font-size:1.6rem;letter-spacing:.5em;text-align:center;padding:13px;border:2px solid var(--line);border-radius:12px;outline:none;transition:.2s}
+.pin:focus{border-color:var(--teal)}
+.btn{display:inline-block;border:none;border-radius:12px;padding:12px 26px;font-family:'Kanit';font-size:.95rem;font-weight:500;cursor:pointer;transition:.2s;text-decoration:none}
+.btn.p{background:var(--deep);color:#fff}.btn.p:hover{background:var(--teal)}
+.btn.g{background:var(--gold);color:var(--deep2)}.btn.g:hover{background:var(--gold2)}
+.btn.o{background:#fff;color:var(--deep);border:1.5px solid var(--line)}.btn.o:hover{border-color:var(--teal)}
+.btn.r{background:#FBE3E3;color:var(--bad)}
+.btn[disabled]{opacity:.5;cursor:wait}
+.err{color:var(--bad);font-size:.8rem;margin-top:10px;min-height:1.2em}
+
+/* tabs */
+.tabs{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+.tab{font-family:'Kanit';font-size:.88rem;padding:10px 18px;border-radius:12px;border:1.5px solid var(--line);background:#fff;color:var(--mut);cursor:pointer;transition:.15s}
+.tab.on{background:var(--deep);border-color:var(--deep);color:#fff}
+.panel{display:none}.panel.on{display:block;animation:fade .25s}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
+
+.card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:24px;margin-bottom:18px}
+.card h2{font-size:1.05rem;color:var(--deep);font-weight:600;margin-bottom:4px}
+.card .cap{font-size:.78rem;color:var(--mut);margin-bottom:16px;line-height:1.6}
+.frow{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:14px}
+label{display:block;font-family:'Kanit';font-size:.78rem;font-weight:500;color:var(--deep);margin-bottom:6px}
+input[type=date],input[type=number],input[type=text],select,textarea{width:100%;font-family:'Sarabun';font-size:.92rem;padding:11px 13px;border:1.5px solid var(--line);border-radius:11px;outline:none;background:#fff;transition:.15s}
+input:focus,select:focus,textarea:focus{border-color:var(--teal)}
+textarea{resize:vertical;min-height:70px}
+.hint{font-size:.72rem;color:var(--mut);margin-top:5px}
+.note{background:#FDF3E1;border:1px solid #F0D9AE;border-radius:12px;padding:12px 16px;font-size:.8rem;color:#7A5410;line-height:1.65;margin-bottom:16px}
+.note b{font-family:'Kanit'}
+.okmsg{background:#E1F2E7;border:1px solid #BFE3CC;border-radius:12px;padding:12px 16px;font-size:.85rem;color:#1D6E3F;margin-top:14px;display:none}
+.badmsg{background:#FBE3E3;border:1px solid #F1C4C4;border-radius:12px;padding:12px 16px;font-size:.85rem;color:var(--bad);margin-top:14px;display:none}
+
+/* today summary */
+.todaybox{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px}
+.tb-i{background:#EAF3EF;border-radius:12px;padding:10px 16px;font-size:.78rem;color:var(--teal)}
+.tb-i b{display:block;font-family:'Kanit';font-size:1.3rem;color:var(--deep)}
+
+table{width:100%;border-collapse:collapse;font-size:.83rem}
+th{background:var(--deep);color:#fff;font-family:'Kanit';font-weight:500;font-size:.75rem;padding:10px;text-align:left}
+th:first-child{border-radius:10px 0 0 0}th:last-child{border-radius:0 10px 0 0}
+td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:nth-child(even) td{background:#FBFAF4}
+.mini{font-size:.72rem;padding:5px 10px;border-radius:8px;border:none;font-family:'Kanit';cursor:pointer;margin-right:4px}
+.m-e{background:#EAF3EF;color:var(--teal)}.m-d{background:#FBE3E3;color:var(--bad)}
+.tbl-scroll{overflow-x:auto}
+.pill{display:inline-block;font-size:.68rem;font-weight:700;border-radius:99px;padding:3px 9px;background:#EAF3EF;color:var(--teal)}
+
+/* excel */
+.drop{border:2.5px dashed #C9D2CD;border-radius:16px;padding:34px;text-align:center;color:var(--mut);cursor:pointer;transition:.2s;font-size:.9rem}
+.drop:hover,.drop.over{border-color:var(--teal);background:#F2F7F4;color:var(--teal)}
+.drop b{font-family:'Kanit';display:block;font-size:1rem;margin-bottom:4px;color:var(--deep)}
+.prev-badge{display:inline-block;font-size:.72rem;border-radius:99px;padding:3px 10px;margin-left:6px}
+.pb-ok{background:#E1F2E7;color:#1D6E3F}.pb-bad{background:#FBE3E3;color:var(--bad)}
+.bar{height:10px;background:#EDEAE0;border-radius:99px;overflow:hidden;margin-top:12px;display:none}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--teal),var(--gold));border-radius:99px;transition:width .3s}
+@media(max-width:640px){.wrap{padding:16px 12px 50px}.card{padding:18px}}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <img src="ตราหนองบัวลำภู.png" alt="" onerror="this.style.display='none'">
+  <div><b>ระบบกรอกข้อมูล — ความปลอดภัยนักท่องเที่ยว</b><span>จังหวัดหนองบัวลำภู • ห้วง มิ.ย. – ก.ย. 2569</span></div>
+  <div class="sp"></div>
+  <div class="who" id="who" style="display:none">ผู้ใช้: <b id="whoName">–</b></div>
+  <a class="tbtn" href="index.html">📊 แดชบอร์ด</a>
+  <button class="tbtn" id="btnOut" style="display:none">ออกจากระบบ</button>
+</header>
+
+<!-- ═══ LOGIN ═══ -->
+<div class="login" id="loginBox">
+  <img src="ตราหนองบัวลำภู.png" alt="" onerror="this.style.display='none'">
+  <h1>เข้าสู่ระบบบันทึกข้อมูล</h1>
+  <p>กรอกรหัสประจำจุดตรวจของท่าน (6 หลัก)<br>หรือรหัสผู้ดูแลระดับจังหวัด — รหัสจะถูกเข้ารหัส SHA-256 ก่อนส่งตรวจสอบ ไม่มีการเก็บรหัสจริงในระบบ</p>
+  <input class="pin" id="pinInput" type="password" inputmode="numeric" maxlength="6" placeholder="••••••" autocomplete="off">
+  <div class="err" id="loginErr"></div>
+  <button class="btn p" id="btnLogin" style="width:100%;margin-top:6px">เข้าสู่ระบบ</button>
+</div>
+
+<!-- ═══ APP ═══ -->
+<div class="wrap" id="app" style="display:none">
+
+  <div class="tabs">
+    <button class="tab on" data-t="t1">🛡️ บันทึกผลตรวจรายวัน</button>
+    <button class="tab" data-t="t2">📋 สถานะมาตรการ (แก้ไขได้)</button>
+    <button class="tab" data-t="t3">🕓 ประวัติ / แก้ไขรายการ</button>
+    <button class="tab" data-t="t4">📗 Excel นำเข้า–ส่งออก</button>
+  </div>
+
+  <!-- ── T1: บันทึกผลตรวจ ── -->
+  <div class="panel on" id="t1">
+    <div class="card">
+      <h2>บันทึกผลการออกตรวจ / ลาดตระเวน / เฝ้าระวังเหตุ</h2>
+      <p class="cap">ระบบนับแบบ <b>ทบยอดสะสม</b> — ทุกครั้งที่บันทึกจะถูกบวกเพิ่มเข้ายอดของจุดตรวจ (ไม่ทับของเดิม) โดยยึดวันที่ปฏิบัติงานเป็นหลัก แนะนำบันทึกทุกวันหลังเสร็จภารกิจ</p>
+      <div class="frow">
+        <div><label>วันที่ปฏิบัติงาน</label><input type="date" id="pDate"></div>
+        <div><label>จุดตรวจ</label><select id="pCp"></select></div>
+        <div><label>จำนวนครั้งที่ออกตรวจ (วันนี้)</label><input type="number" id="pCount" min="0" step="1" placeholder="เช่น 3">
+          <div class="hint">นับรวมการตั้งจุดตรวจ/จุดสกัด ลาดตระเวน และเฝ้าระวังเหตุ</div></div>
+      </div>
+      <div style="margin-bottom:14px"><label>หมายเหตุ (ถ้ามี)</label><input type="text" id="pNote" placeholder="เช่น ลาดตระเวนร่วมกับ อปท. ช่วงเทศกาล"></div>
+      <button class="btn p" id="btnSaveP">💾 บันทึก (บวกเพิ่มยอดสะสม)</button>
+      <div class="okmsg" id="pOk"></div><div class="badmsg" id="pBad"></div>
+      <div class="todaybox">
+        <div class="tb-i"><b id="sumToday">–</b>บันทึกแล้ววันนี้ (ครั้ง)</div>
+        <div class="tb-i"><b id="sumMonth">–</b>ยอดสะสมเดือนนี้ (ครั้ง)</div>
+        <div class="tb-i"><b id="sumAll">–</b>ยอดสะสมทั้งห้วง / เป้า <span id="sumTg"></span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── T2: มาตรการ ── -->
+  <div class="panel" id="t2">
+    <div class="card">
+      <h2>สถานะความคืบหน้าตามมาตรการ (Qualitative)</h2>
+      <p class="cap">ระบบดึง<b>ค่าล่าสุด</b>ที่เคยรายงานมาแสดง — แก้ไขแล้วกดบันทึก ค่าใหม่จะทับค่าเดิมทันที (แดชบอร์ดอัปเดตเรียลไทม์)</p>
+      <div class="frow">
+        <div><label>จุดตรวจ</label><select id="mCp"></select></div>
+      </div>
+      <div class="frow">
+        <div><label>📹 CCTV / ไฟส่องสว่างจุดเสี่ยง (มาตรการ 1.2)</label>
+          <select id="mCctv"><option value="">— เลือกสถานะ —</option>
+            <option>พร้อมใช้งานตลอด 24 ชั่วโมง 100%</option>
+            <option>พร้อมใช้งานบางส่วน (อยู่ระหว่างซ่อมแซม/ปรับปรุง)</option>
+            <option>ไม่มีระบบ CCTV หรือไฟส่องสว่างในพื้นที่</option></select></div>
+        <div><label>🈺 ป้ายเตือน/บอกทาง 3 ภาษา ไทย-อังกฤษ-จีน (มาตรการ 2.1)</label>
+          <select id="mSigns"><option value="">— เลือกสถานะ —</option>
+            <option>ดำเนินการติดตั้งเรียบร้อยแล้ว ครบถ้วนชัดเจน</option>
+            <option>อยู่ระหว่างจัดทำ/ยังไม่ครบ 3 ภาษา</option>
+            <option>ยังไม่ได้ดำเนินการ</option></select></div>
+        <div><label>🛟 ไลฟ์การ์ด / อุปกรณ์ช่วยชีวิต เสื้อชูชีพ AED (มาตรการ 2.1)</label>
+          <select id="mLife"><option value="">— เลือกสถานะ —</option>
+            <option>มีครบถ้วนและเพียงพอ</option>
+            <option>มีบางส่วน แต่ยังไม่เพียงพอ</option>
+            <option>ไม่มี (ไม่ใช่แหล่งท่องเที่ยวทางน้ำ)</option></select></div>
+        <div><label>🚑 ซักซ้อมแผนเผชิญเหตุร่วม รพ./กู้ภัย (มาตรการ 3.2)</label>
+          <select id="mDrill"><option value="">— เลือกสถานะ —</option>
+            <option>ซักซ้อมเรียบร้อยแล้ว (อย่างน้อย 1 ครั้งในปีนี้)</option>
+            <option>อยู่ระหว่างการประสานงาน/วางแผน</option>
+            <option>ยังไม่ได้ดำเนินการ</option></select></div>
+        <div><label>⚠️ พบเหตุมิจฉาชีพ/หลอกลวงนักท่องเที่ยวเดือนนี้ (มาตรการ 4)</label>
+          <select id="mScam"><option value="">— เลือกสถานะ —</option>
+            <option>ไม่พบเหตุการณ์</option>
+            <option>พบเหตุการณ์ (ระบุรายละเอียด)</option></select></div>
+      </div>
+      <div style="margin-bottom:14px" id="scamWrap" hidden>
+        <label>รายละเอียดเหตุการณ์ (ขายของเกินราคา / บริการไม่ตรงปก ฯลฯ)</label>
+        <textarea id="mScamDetail" placeholder="ระบุรายละเอียด สถานที่ และการดำเนินการ"></textarea>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <button class="btn p" id="btnSaveM">💾 บันทึกสถานะล่าสุด</button>
+        <span class="hint" id="mUpdated"></span>
+      </div>
+      <div class="okmsg" id="mOk"></div><div class="badmsg" id="mBad"></div>
+    </div>
+  </div>
+
+  <!-- ── T3: ประวัติ ── -->
+  <div class="panel" id="t3">
+    <div class="card">
+      <h2>ประวัติการบันทึกผลตรวจ</h2>
+      <p class="cap" id="histCap">แสดงรายการล่าสุด 60 รายการ — แก้ไข/ลบได้เฉพาะข้อมูลตามสิทธิ์ของท่าน</p>
+      <div class="tbl-scroll"><table>
+        <thead><tr><th>วันที่</th><th>จุดตรวจ</th><th style="text-align:center">จำนวน (ครั้ง)</th><th>หมายเหตุ</th><th>ผู้บันทึก</th><th style="width:130px">จัดการ</th></tr></thead>
+        <tbody id="histBody"><tr><td colspan="6" style="text-align:center;color:var(--mut)">กำลังโหลด…</td></tr></tbody>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- ── T4: Excel ── -->
+  <div class="panel" id="t4">
+    <div class="note"><b>แม่แบบมาตรฐาน:</b> ดาวน์โหลด <a href="แม่แบบนำเข้าข้อมูล_ความปลอดภัยนักท่องเที่ยว.xlsx" download style="color:#8A5A12;font-weight:700">แม่แบบนำเข้าข้อมูล_ความปลอดภัยนักท่องเที่ยว.xlsx</a>
+      กรอกในชีต “ผลตรวจรายวัน” (ทบยอด) และ/หรือ “สถานะมาตรการ” (ทับค่าล่าสุด) แล้วลากไฟล์มาวางด้านล่าง — หรือกด “ส่งออกข้อมูลปัจจุบัน” เพื่อนำไปแก้แล้วนำเข้ากลับ</div>
+
+    <div class="card">
+      <h2>📥 นำเข้าจากไฟล์ Excel</h2>
+      <div class="drop" id="drop"><b>ลากไฟล์ .xlsx มาวางที่นี่ หรือคลิกเพื่อเลือกไฟล์</b>รองรับแม่แบบมาตรฐานของระบบ (ชีต “ผลตรวจรายวัน” และ “สถานะมาตรการ”)</div>
+      <input type="file" id="file" accept=".xlsx,.xls" hidden>
+      <div id="prevWrap" style="display:none;margin-top:16px">
+        <h2 style="font-size:.95rem">ตรวจสอบก่อนนำเข้า <span class="prev-badge pb-ok" id="pvOk"></span><span class="prev-badge pb-bad" id="pvBad"></span></h2>
+        <div class="tbl-scroll" style="max-height:300px;overflow-y:auto;margin-top:8px"><table>
+          <thead><tr><th>ประเภท</th><th>วันที่/จุด</th><th>จุดตรวจ</th><th>ค่า</th><th>สถานะ</th></tr></thead>
+          <tbody id="prevBody"></tbody></table></div>
+        <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn g" id="btnImport">✅ ยืนยันนำเข้า (เฉพาะแถวที่ผ่าน)</button>
+          <button class="btn o" id="btnCancelImp">ยกเลิก</button>
+        </div>
+        <div class="bar" id="impBar"><i id="impProg"></i></div>
+      </div>
+      <div class="okmsg" id="iOk"></div><div class="badmsg" id="iBad"></div>
+    </div>
+
+    <div class="card">
+      <h2>📤 ส่งออกข้อมูลปัจจุบันเป็น Excel</h2>
+      <p class="cap">ได้ไฟล์โครงสร้างเดียวกับแม่แบบ (ผลตรวจทั้งหมด + สถานะมาตรการล่าสุด) — แก้ไขแล้วนำเข้ากลับได้ทันที</p>
+      <button class="btn p" id="btnExport">⬇️ ส่งออกข้อมูลปัจจุบัน (.xlsx)</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ═══════════ CONFIG ═══════════ */
+const GAS_URL = "";   // ← วาง URL Web App (/exec) เดียวกับ index.html; เว้นว่าง = โหมดสาธิต
+
+const CPS=[
+{id:"CP1",no:1,name:"วัดถ้ำสุวรรณคูหา",amp:"สุวรรณคูหา",target:320},
+{id:"CP2",no:2,name:"วัดถ้ำเอราวัณ",amp:"นาวัง",target:200},
+{id:"CP3",no:3,name:"ปั๊ม ปตท.ม่วงแก้ว",amp:"ศรีบุญเรือง",target:230},
+{id:"CP4",no:4,name:"ปั๊ม ปตท.สวนสวรรค์",amp:"ศรีบุญเรือง",target:370},
+{id:"CP5",no:5,name:"สวนสาธารณะเขื่อนบั้งไฟแสน",amp:"ศรีบุญเรือง",target:250},
+{id:"CP6",no:6,name:"น้ำตกเฒ่าโต้",amp:"เมืองหนองบัวลำภู",target:250},
+{id:"CP7",no:7,name:"พิพิธภัณฑ์หอยหิน 150 ล้านปี",amp:"เมืองหนองบัวลำภู",target:230},
+{id:"CP8",no:8,name:"ภูพานน้อย",amp:"เมืองหนองบัวลำภู",target:120},
+{id:"CP9",no:9,name:"สวนสาธารณะหนองน้ำนันทจันทร์",amp:"นากลาง",target:250},
+{id:"CP10",no:10,name:"หลวงพ่อใหญ่ วัดศิริชัยเจริญธรรม",amp:"โนนสัง",target:410},
+{id:"CP11",no:11,name:"สวนสุขภาพโนนสัง",amp:"โนนสัง",target:420},
+{id:"CP12",no:12,name:"สะพานเชื่อมฮักบ้านตาดไฮ",amp:"โนนสัง",target:550}];
+const CPMAP=Object.fromEntries(CPS.map(c=>[c.id,c]));
+
+const $=id=>document.getElementById(id);
+const fmt=n=>Number(n).toLocaleString("th-TH");
+let ROLE=null, HASH=null, CACHE=null, IMPORT={rows:[],measures:[]};
+
+/* ═══════════ CORE ═══════════ */
+async function sha256(str){
+  const buf=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(str));
+  return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,"0")).join("");
+}
+function jsonp(params){
+  return new Promise((res,rej)=>{
+    if(!GAS_URL){ res(demoServer(params)); return; }
+    const cb="cb"+Date.now()+Math.floor(Math.random()*999);
+    window[cb]=d=>{delete window[cb];s.remove();res(d);};
+    const q=Object.entries({...params,callback:cb}).map(([k,v])=>k+"="+encodeURIComponent(v)).join("&");
+    const s=document.createElement("script"); s.src=GAS_URL+"?"+q;
+    s.onerror=()=>{delete window[cb];s.remove();rej(new Error("เชื่อมต่อไม่สำเร็จ"));};
+    document.body.appendChild(s);
+    setTimeout(()=>{if(window[cb]){delete window[cb];s.remove();rej(new Error("หมดเวลาเชื่อมต่อ"));}},30000);
+  });
+}
+/* โหมดสาธิต — จำลองเซิร์ฟเวอร์ในหน่วยความจำ (รีเฟรชแล้วหาย) */
+const demoDB={patrols:[],measures:{}};
+function demoServer(p){
+  switch(p.action){
+    case "verifyPin": return {ok:true,role:"ADMIN"};
+    case "getData": return {ok:true,patrols:demoDB.patrols,measures:demoDB.measures,serverTime:"โหมดสาธิต"};
+    case "addPatrol":{const id="P"+Date.now();demoDB.patrols.push({id,date:p.date,month:mOf(p.date),cp:p.cp,count:+p.count,note:p.note||"",by:"DEMO"});return {ok:true,id};}
+    case "editPatrol":{const r=demoDB.patrols.find(x=>x.id===p.id);if(r){r.date=p.date;r.month=mOf(p.date);r.count=+p.count;r.note=p.note||"";}return {ok:true};}
+    case "deletePatrol":{demoDB.patrols=demoDB.patrols.filter(x=>x.id!==p.id);return {ok:true};}
+    case "updateMeasures":{demoDB.measures[p.cp]={cctv:p.cctv,signs:p.signs,lifeguard:p.lifeguard,drill:p.drill,scam:p.scam,scamDetail:p.scamDetail,updated:"เมื่อครู่"};return {ok:true};}
+    case "bulkImport":{let a=0;if(p.rows)JSON.parse(decodeURIComponent(p.rows)).forEach(r=>{demoDB.patrols.push({id:"P"+Date.now()+a,date:r.date,month:mOf(r.date),cp:r.cp,count:+r.count,note:r.note||"",by:"DEMO(import)"});a++;});
+      let u=0;if(p.measures)JSON.parse(decodeURIComponent(p.measures)).forEach(m=>{demoDB.measures[m.cp]={...m,updated:"เมื่อครู่"};u++;});return {ok:true,added:a,updated:u};}
+  }
+  return {ok:false,error:"?"};
+}
+function mOf(d){const p=String(d).split("-");return (+p[0]+543)+"-"+p[1];}
+function flash(el,msg){el.textContent=msg;el.style.display="block";setTimeout(()=>el.style.display="none",4200);}
+
+/* ═══════════ LOGIN ═══════════ */
+async function doLogin(){
+  const pin=$("pinInput").value.trim();
+  if(pin.length<4){$("loginErr").textContent="กรอกรหัสให้ครบ";return;}
+  $("btnLogin").disabled=true;$("loginErr").textContent="";
+  try{
+    HASH=await sha256(pin);
+    const r=await jsonp({action:"verifyPin",hash:HASH});
+    if(!r.ok) throw new Error(r.error||"รหัสไม่ถูกต้อง");
+    ROLE=r.role;
+    sessionStorage.setItem("ts_hash",HASH);sessionStorage.setItem("ts_role",ROLE);
+    enter();
+  }catch(e){$("loginErr").textContent=e.message;}
+  $("btnLogin").disabled=false;
+}
+function enter(){
+  $("loginBox").style.display="none";$("app").style.display="block";
+  $("who").style.display="block";$("btnOut").style.display="inline-block";
+  $("whoName").textContent=ROLE==="ADMIN"?"ผู้ดูแลระดับจังหวัด":`จุดตรวจที่ ${CPMAP[ROLE].no} ${CPMAP[ROLE].name}`;
+  buildCpSelects(); refresh();
+}
+$("btnLogin").onclick=doLogin;
+$("pinInput").addEventListener("keydown",e=>{if(e.key==="Enter")doLogin();});
+$("btnOut").onclick=()=>{sessionStorage.clear();location.reload();};
+(function resume(){const h=sessionStorage.getItem("ts_hash"),r=sessionStorage.getItem("ts_role");
+  if(h&&r){HASH=h;ROLE=r;enter();}})();
+
+function buildCpSelects(){
+  const opts=c=>`<option value="${c.id}">จุดตรวจที่ ${c.no} ${c.name} (อ.${c.amp})</option>`;
+  const list=ROLE==="ADMIN"?CPS:CPS.filter(c=>c.id===ROLE);
+  $("pCp").innerHTML=list.map(opts).join("");
+  $("mCp").innerHTML=list.map(opts).join("");
+  $("pDate").value=new Date().toISOString().slice(0,10);
+}
+
+/* ═══════════ DATA ═══════════ */
+async function refresh(){
+  try{ CACHE=await jsonp({action:"getData"}); }
+  catch(e){ CACHE={ok:false,patrols:[],measures:{}}; }
+  renderSums(); renderHist(); loadMeasureForm();
+}
+function renderSums(){
+  const cp=$("pCp").value, today=new Date().toISOString().slice(0,10), mo=mOf(today);
+  const list=CACHE.patrols.filter(p=>ROLE==="ADMIN"?p.cp===cp:p.cp===ROLE);
+  $("sumToday").textContent=fmt(list.filter(p=>p.date===today).reduce((s,p)=>s+p.count,0));
+  $("sumMonth").textContent=fmt(list.filter(p=>p.month===mo).reduce((s,p)=>s+p.count,0));
+  $("sumAll").textContent=fmt(list.reduce((s,p)=>s+p.count,0));
+  $("sumTg").textContent=fmt((CPMAP[cp]||{}).target||0)+" ครั้ง";
+}
+$("pCp").addEventListener("change",()=>{renderSums();});
+$("mCp").addEventListener("change",loadMeasureForm);
+
+/* ── บันทึกผลตรวจ ── */
+$("btnSaveP").onclick=async()=>{
+  const date=$("pDate").value, cp=$("pCp").value, count=$("pCount").value;
+  if(!date||count===""||+count<0){flash($("pBad"),"กรอกวันที่และจำนวนครั้งให้ถูกต้อง");return;}
+  $("btnSaveP").disabled=true;
+  try{
+    const r=await jsonp({action:"addPatrol",hash:HASH,cp,date,count,note:$("pNote").value});
+    if(!r.ok)throw new Error(r.error);
+    flash($("pOk"),`✅ บันทึกสำเร็จ +${fmt(count)} ครั้ง (ทบยอดสะสม) — ${CPMAP[cp].name} วันที่ ${date}`);
+    $("pCount").value="";$("pNote").value="";
+    await refresh();
+  }catch(e){flash($("pBad"),"❌ "+e.message);}
+  $("btnSaveP").disabled=false;
+};
+
+/* ── มาตรการ: โหลดค่าล่าสุด + บันทึกทับ ── */
+function loadMeasureForm(){
+  const m=(CACHE&&CACHE.measures&&CACHE.measures[$("mCp").value])||{};
+  $("mCctv").value=m.cctv||"";$("mSigns").value=m.signs||"";$("mLife").value=m.lifeguard||"";
+  $("mDrill").value=m.drill||"";$("mScam").value=m.scam||"";$("mScamDetail").value=m.scamDetail||"";
+  $("scamWrap").hidden=!(m.scam&&m.scam.indexOf("พบเหตุการณ์")>-1);
+  $("mUpdated").textContent=m.updated?`อัปเดตล่าสุด: ${m.updated}${m.by?" โดย "+m.by:""}`:"ยังไม่เคยรายงานสถานะจุดนี้";
+}
+$("mScam").addEventListener("change",()=>{$("scamWrap").hidden=$("mScam").value.indexOf("พบเหตุการณ์")===-1;});
+$("btnSaveM").onclick=async()=>{
+  $("btnSaveM").disabled=true;
+  try{
+    const r=await jsonp({action:"updateMeasures",hash:HASH,cp:$("mCp").value,
+      cctv:$("mCctv").value,signs:$("mSigns").value,lifeguard:$("mLife").value,
+      drill:$("mDrill").value,scam:$("mScam").value,scamDetail:$("mScamDetail").value});
+    if(!r.ok)throw new Error(r.error);
+    flash($("mOk"),"✅ บันทึกสถานะล่าสุดเรียบร้อย — แดชบอร์ดอัปเดตแล้ว");
+    await refresh();
+  }catch(e){flash($("mBad"),"❌ "+e.message);}
+  $("btnSaveM").disabled=false;
+};
+
+/* ── ประวัติ ── */
+function renderHist(){
+  const mine=CACHE.patrols.filter(p=>ROLE==="ADMIN"||p.cp===ROLE)
+    .sort((a,b)=>(b.date+b.id).localeCompare(a.date+a.id)).slice(0,60);
+  $("histCap").textContent=(ROLE==="ADMIN"?"สิทธิ์ผู้ดูแล: จัดการได้ทุกจุดตรวจ":"แสดงเฉพาะจุดตรวจของท่าน")+" • รายการล่าสุด 60 รายการ";
+  $("histBody").innerHTML=mine.length?mine.map(p=>`
+    <tr><td>${p.date}</td>
+    <td><span class="pill">${(CPMAP[p.cp]||{}).no||"?"}</span> ${(CPMAP[p.cp]||{}).name||p.cp}</td>
+    <td style="text-align:center;font-family:Kanit;font-weight:600">${fmt(p.count)}</td>
+    <td style="font-size:.78rem;color:var(--mut)">${p.note||"—"}</td>
+    <td style="font-size:.75rem">${p.by||""}</td>
+    <td><button class="mini m-e" onclick="editRow('${p.id}')">แก้ไข</button><button class="mini m-d" onclick="delRow('${p.id}')">ลบ</button></td></tr>`).join("")
+    :`<tr><td colspan="6" style="text-align:center;color:var(--mut)">ยังไม่มีข้อมูล</td></tr>`;
+}
+window.editRow=async id=>{
+  const p=CACHE.patrols.find(x=>x.id===id); if(!p)return;
+  const count=prompt(`แก้ไขจำนวนครั้ง (${p.date} • ${(CPMAP[p.cp]||{}).name})`,p.count);
+  if(count===null)return;
+  const note=prompt("หมายเหตุ",p.note||""); if(note===null)return;
+  try{
+    const r=await jsonp({action:"editPatrol",hash:HASH,id,date:p.date,cp:p.cp,count,note});
+    if(!r.ok)throw new Error(r.error);
+    await refresh();
+  }catch(e){alert("❌ "+e.message);}
+};
+window.delRow=async id=>{
+  if(!confirm("ยืนยันลบรายการนี้? ยอดสะสมจะถูกหักออก"))return;
+  try{
+    const r=await jsonp({action:"deletePatrol",hash:HASH,id});
+    if(!r.ok)throw new Error(r.error);
+    await refresh();
+  }catch(e){alert("❌ "+e.message);}
+};
+
+/* ═══════════ EXCEL ═══════════ */
+$("drop").onclick=()=>$("file").click();
+["dragover","dragleave","drop"].forEach(ev=>$("drop").addEventListener(ev,e=>{
+  e.preventDefault();$("drop").classList.toggle("over",ev==="dragover");
+  if(ev==="drop"&&e.dataTransfer.files[0])readFile(e.dataTransfer.files[0]);
+}));
+$("file").addEventListener("change",e=>{if(e.target.files[0])readFile(e.target.files[0]);});
+
+function readFile(f){
+  const rd=new FileReader();
+  rd.onload=e=>{
+    try{
+      const wb=XLSX.read(new Uint8Array(e.target.result),{type:"array"});
+      parseWB(wb);
+    }catch(err){flash($("iBad"),"❌ อ่านไฟล์ไม่ได้: "+err.message);}
+  };
+  rd.readAsArrayBuffer(f);
+}
+function parseWB(wb){
+  IMPORT={rows:[],measures:[]}; const prev=[]; let ok=0,bad=0;
+  const isDate=v=>/^\d{4}-\d{2}-\d{2}$/.test(v);
+  const toDate=v=>{
+    if(v instanceof Date)return v.toISOString().slice(0,10);
+    if(typeof v==="number"){const d=XLSX.SSF.parse_date_code(v);return d?`${d.y}-${String(d.m).padStart(2,"0")}-${String(d.d).padStart(2,"0")}`:"";}
+    return String(v).trim();
+  };
+  const ws1=wb.Sheets["ผลตรวจรายวัน"];
+  if(ws1){
+    XLSX.utils.sheet_to_json(ws1,{header:1,range:1}).forEach(r=>{
+      if(!r||r.length===0||(!r[0]&&!r[1]))return;
+      const date=toDate(r[0]), cp=String(r[1]||"").trim().toUpperCase(), count=Number(r[2]);
+      const good=isDate(date)&&CPMAP[cp]&&!isNaN(count)&&count>=0&&(ROLE==="ADMIN"||cp===ROLE);
+      const why=!isDate(date)?"วันที่ผิดรูปแบบ":!CPMAP[cp]?"ไม่รู้จักจุดตรวจ":isNaN(count)||count<0?"จำนวนไม่ถูกต้อง":(ROLE!=="ADMIN"&&cp!==ROLE)?"เกินสิทธิ์ของท่าน":"";
+      if(good){IMPORT.rows.push({date,cp,count,note:String(r[3]||"")});ok++;}else bad++;
+      prev.push(["ผลตรวจ",date,cp,isNaN(count)?"?":fmt(count)+" ครั้ง",good?"✅ ผ่าน":"⛔ "+why]);
+    });
+  }
+  const ws2=wb.Sheets["สถานะมาตรการ"];
+  if(ws2){
+    XLSX.utils.sheet_to_json(ws2,{header:1,range:1}).forEach(r=>{
+      if(!r||!r[0])return;
+      const cp=String(r[0]).trim().toUpperCase();
+      const hasAny=[2,3,4,5,6].some(i=>r[i]);
+      if(!hasAny)return;
+      const good=!!CPMAP[cp]&&(ROLE==="ADMIN"||cp===ROLE);
+      const why=!CPMAP[cp]?"ไม่รู้จักจุดตรวจ":"เกินสิทธิ์ของท่าน";
+      if(good){IMPORT.measures.push({cp,cctv:String(r[2]||""),signs:String(r[3]||""),lifeguard:String(r[4]||""),drill:String(r[5]||""),scam:String(r[6]||""),scamDetail:String(r[7]||"")});ok++;}else bad++;
+      prev.push(["มาตรการ","สถานะล่าสุด",cp,"อัปเดต 5 มาตรการ",good?"✅ ผ่าน":"⛔ "+why]);
+    });
+  }
+  if(!prev.length){flash($("iBad"),"❌ ไม่พบข้อมูลในชีต “ผลตรวจรายวัน” หรือ “สถานะมาตรการ” — ใช้แม่แบบมาตรฐานเท่านั้น");return;}
+  $("prevBody").innerHTML=prev.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join("")}</tr>`).join("");
+  $("pvOk").textContent=`ผ่าน ${ok} แถว`;
+  $("pvBad").textContent=bad?`ไม่ผ่าน ${bad} แถว (จะถูกข้าม)`:"";
+  $("pvBad").style.display=bad?"inline-block":"none";
+  $("prevWrap").style.display="block";
+}
+$("btnCancelImp").onclick=()=>{$("prevWrap").style.display="none";$("file").value="";};
+$("btnImport").onclick=async()=>{
+  if(!IMPORT.rows.length&&!IMPORT.measures.length)return;
+  $("btnImport").disabled=true;$("impBar").style.display="block";
+  try{
+    /* JSONP เป็น GET — แบ่งส่งเป็นก้อนละ 15 แถวกัน URL ยาวเกิน */
+    const chunks=[];
+    for(let i=0;i<IMPORT.rows.length;i+=15)chunks.push({rows:IMPORT.rows.slice(i,i+15)});
+    if(IMPORT.measures.length)chunks.push({measures:IMPORT.measures});
+    if(!chunks.length)chunks.push({});
+    let done=0,added=0,upd=0;
+    for(const ch of chunks){
+      const p={action:"bulkImport",hash:HASH};
+      if(ch.rows)p.rows=encodeURIComponent(JSON.stringify(ch.rows));
+      if(ch.measures)p.measures=encodeURIComponent(JSON.stringify(ch.measures));
+      const r=await jsonp(p);
+      if(!r.ok)throw new Error(r.error);
+      added+=r.added||0;upd+=r.updated||0;done++;
+      $("impProg").style.width=(done/chunks.length*100)+"%";
+    }
+    flash($("iOk"),`✅ นำเข้าสำเร็จ — ผลตรวจ ${fmt(added)} แถว (ทบยอด) • สถานะมาตรการ ${upd} จุด`);
+    $("prevWrap").style.display="none";$("file").value="";
+    await refresh();
+  }catch(e){flash($("iBad"),"❌ "+e.message);}
+  $("btnImport").disabled=false;$("impBar").style.display="none";$("impProg").style.width="0";
+};
+
+/* ── export ── */
+$("btnExport").onclick=()=>{
+  const wb=XLSX.utils.book_new();
+  const s1=[["วันที่ (YYYY-MM-DD)","จุดตรวจ (รหัส)","จำนวนครั้งที่ออกตรวจ","หมายเหตุ"]];
+  CACHE.patrols.filter(p=>ROLE==="ADMIN"||p.cp===ROLE)
+    .sort((a,b)=>a.date.localeCompare(b.date))
+    .forEach(p=>s1.push([p.date,p.cp,p.count,p.note||""]));
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(s1),"ผลตรวจรายวัน");
+  const s2=[["จุดตรวจ (รหัส)","ชื่อจุดตรวจ","CCTV/ไฟส่องสว่าง (ม.1.2)","ป้าย 3 ภาษา (ม.2.1)","ไลฟ์การ์ด/อุปกรณ์ช่วยชีวิต (ม.2.1)","ซักซ้อมแผนเผชิญเหตุ (ม.3.2)","พบเหตุมิจฉาชีพเดือนนี้ (ม.4)","รายละเอียดเหตุ (ถ้ามี)"]];
+  CPS.filter(c=>ROLE==="ADMIN"||c.id===ROLE).forEach(c=>{
+    const m=CACHE.measures[c.id]||{};
+    s2.push([c.id,c.name,m.cctv||"",m.signs||"",m.lifeguard||"",m.drill||"",m.scam||"",m.scamDetail||""]);
+  });
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(s2),"สถานะมาตรการ");
+  XLSX.writeFile(wb,`ข้อมูลความปลอดภัยนักท่องเที่ยว_นภ_${new Date().toISOString().slice(0,10)}.xlsx`);
+};
+
+/* tabs */
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("on"));
+  document.querySelectorAll(".panel").forEach(x=>x.classList.remove("on"));
+  t.classList.add("on");$(t.dataset.t).classList.add("on");
+});
+
+if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(()=>{});
+</script>
+</body>
+</html>

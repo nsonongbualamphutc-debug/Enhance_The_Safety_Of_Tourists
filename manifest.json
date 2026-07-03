@@ -1,0 +1,13 @@
+{
+  "name": "เที่ยวปลอดภัย หนองบัวลำภู",
+  "short_name": "เที่ยวปลอดภัย นภ.",
+  "description": "แดชบอร์ดเสริมสร้างความปลอดภัยนักท่องเที่ยว จังหวัดหนองบัวลำภู",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#123C33",
+  "theme_color": "#123C33",
+  "lang": "th",
+  "icons": [
+    { "src": "ตราหนองบัวลำภู.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

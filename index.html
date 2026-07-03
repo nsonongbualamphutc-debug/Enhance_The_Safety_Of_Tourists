@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>เที่ยวปลอดภัย หนองบัวลำภู | แดชบอร์ดเสริมสร้างความปลอดภัยนักท่องเที่ยว</title>
+<meta name="theme-color" content="#123C33">
+<link rel="icon" href="ตราหนองบัวลำภู.png">
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{
+  --deep:#123C33; --deep2:#0B2A24; --teal:#1B6B5A; --teal-soft:#2E8B74;
+  --gold:#E9A13B; --gold-soft:#F5C877; --lotus:#D96C8A;
+  --paper:#F5F2E9; --card:#FFFFFF; --ink:#1E2B27; --mut:#5E6F69;
+  --ok:#2E8B57; --warn:#E9A13B; --bad:#D64545; --line:#E3DFD2;
+  --shadow:0 10px 30px rgba(18,60,51,.10);
+  --r:18px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Sarabun',sans-serif;background:var(--paper);color:var(--ink);font-size:16px}
+h1,h2,h3,.disp{font-family:'Kanit',sans-serif}
+img{max-width:100%}
+a{color:inherit}
+
+/* ================= TOP BAR ================= */
+.topbar{position:sticky;top:0;z-index:1200;background:rgba(18,60,51,.96);backdrop-filter:blur(8px);
+  color:#fff;display:flex;align-items:center;gap:14px;padding:10px 22px;box-shadow:0 2px 14px rgba(0,0,0,.25)}
+.topbar img{width:46px;height:46px;object-fit:contain;filter:drop-shadow(0 2px 5px rgba(0,0,0,.4))}
+.tb-title{line-height:1.15}
+.tb-title b{font-family:'Kanit';font-weight:600;font-size:1.05rem;letter-spacing:.2px}
+.tb-title span{display:block;font-size:.74rem;color:#BFD9CF}
+.tb-sp{flex:1}
+.clock{font-family:'Kanit';font-weight:300;font-size:.95rem;color:var(--gold-soft);white-space:nowrap}
+.tb-btn{border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.08);color:#fff;
+  border-radius:10px;padding:8px 14px;font-family:'Kanit';font-size:.85rem;cursor:pointer;transition:.2s;white-space:nowrap}
+.tb-btn:hover{background:var(--gold);border-color:var(--gold);color:var(--deep2)}
+.tb-btn.gold{background:var(--gold);border-color:var(--gold);color:var(--deep2);font-weight:600}
+.tb-btn.gold:hover{background:var(--gold-soft)}
+select.tb-btn{appearance:none;-webkit-appearance:none;padding-right:26px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23F5C877'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 10px center}
+select.tb-btn option{color:var(--ink)}
+
+/* ================= HERO ================= */
+.hero{position:relative;overflow:hidden;color:#fff;
+  background:linear-gradient(180deg,#0B2A24 0%,#123C33 34%,#1B6B5A 72%,#2E8B74 100%)}
+.hero::before{content:"";position:absolute;inset:0;
+  background:radial-gradient(1200px 500px at 50% 118%,rgba(233,161,59,.35),transparent 62%);pointer-events:none}
+.hero-in{max-width:1280px;margin:0 auto;padding:38px 24px 0;display:grid;grid-template-columns:1.05fr .95fr;gap:26px;align-items:center;position:relative;z-index:2}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:'Kanit';font-weight:400;font-size:.82rem;
+  letter-spacing:.16em;color:var(--gold-soft);text-transform:uppercase;border:1px solid rgba(245,200,119,.4);
+  border-radius:999px;padding:6px 16px;margin-bottom:16px}
+.eyebrow::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--gold);box-shadow:0 0 10px var(--gold);animation:pulse 2s infinite}
+@keyframes pulse{50%{opacity:.35}}
+.hero h1{font-size:clamp(1.7rem,3.4vw,2.7rem);font-weight:700;line-height:1.2}
+.hero h1 em{font-style:normal;color:var(--gold-soft)}
+.hero .sub{margin-top:12px;color:#CFE5DC;font-size:1rem;max-width:560px;line-height:1.7}
+.verdict{margin-top:22px;display:inline-flex;align-items:center;gap:12px;background:rgba(255,255,255,.09);
+  border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:12px 18px}
+.verdict .dot{width:14px;height:14px;border-radius:50%}
+.verdict b{font-family:'Kanit';font-size:1.06rem}
+.verdict small{display:block;color:#BFD9CF;font-size:.8rem;font-weight:400}
+.hero-mini{display:flex;gap:12px;margin:24px 0 30px;flex-wrap:wrap}
+.hm{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:10px 16px;min-width:128px}
+.hm b{display:block;font-family:'Kanit';font-size:1.35rem;font-weight:600;color:#fff}
+.hm span{font-size:.74rem;color:#BFD9CF}
+/* sunrise gauge */
+.gaugewrap{position:relative;text-align:center;padding-bottom:0}
+.gaugewrap svg{width:100%;max-width:480px;display:block;margin:0 auto}
+.gauge-center{position:absolute;left:50%;top:58%;transform:translate(-50%,-50%);text-align:center;pointer-events:none}
+.gauge-center b{font-family:'Kanit';font-weight:800;font-size:clamp(2.4rem,4.6vw,3.6rem);color:#fff;text-shadow:0 4px 24px rgba(0,0,0,.35)}
+.gauge-center b i{font-style:normal;font-size:.5em;color:var(--gold-soft)}
+.gauge-center span{display:block;font-size:.85rem;color:#CFE5DC;margin-top:2px}
+/* mountains strip */
+.mountains{display:block;width:100%;margin-top:-6px}
+
+/* ================= LAYOUT ================= */
+.wrap{max-width:1280px;margin:0 auto;padding:0 24px}
+section{padding:44px 0 8px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:20px;flex-wrap:wrap}
+.sec-head h2{font-size:1.5rem;font-weight:600;color:var(--deep)}
+.sec-head .tag{font-family:'Kanit';font-size:.74rem;letter-spacing:.14em;color:var(--teal);background:#E3EFE9;
+  border-radius:999px;padding:4px 12px;text-transform:uppercase}
+.sec-head p{color:var(--mut);font-size:.9rem;flex-basis:100%}
+
+/* KPI */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
+.kpi{background:var(--card);border-radius:var(--r);padding:18px 18px 16px;box-shadow:var(--shadow);
+  border-top:4px solid var(--teal);position:relative;overflow:hidden}
+.kpi.gold{border-top-color:var(--gold)} .kpi.rose{border-top-color:var(--lotus)} .kpi.bad{border-top-color:var(--bad)}
+.kpi .ic{font-size:1.3rem;position:absolute;top:14px;right:14px;opacity:.9}
+.kpi b{font-family:'Kanit';font-size:1.9rem;font-weight:700;color:var(--deep);display:block;line-height:1.1}
+.kpi b small{font-size:.5em;color:var(--mut);font-weight:500}
+.kpi span{font-size:.8rem;color:var(--mut)}
+.kpi .sub2{font-size:.74rem;color:var(--teal);margin-top:5px;display:block;font-weight:600}
+
+/* CARDS */
+.card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:22px}
+.grid2{display:grid;grid-template-columns:1.15fr .85fr;gap:18px}
+.grid2b{display:grid;grid-template-columns:.9fr 1.1fr;gap:18px}
+@media(max-width:980px){.grid2,.grid2b,.hero-in{grid-template-columns:1fr}}
+
+/* MAP */
+#map{height:560px;border-radius:14px;z-index:1}
+.leaflet-container{font-family:'Sarabun'}
+.cp-pin{display:flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50% 50% 50% 4px;
+  transform:rotate(-45deg);box-shadow:0 4px 12px rgba(0,0,0,.35);border:2.5px solid #fff}
+.cp-pin span{transform:rotate(45deg);font-size:17px;line-height:1}
+.popcard{width:270px;font-family:'Sarabun'}
+.popcard .cover{height:88px;border-radius:10px;display:flex;align-items:flex-end;padding:8px 12px;color:#fff;position:relative;overflow:hidden}
+.popcard .cover .em{position:absolute;right:8px;top:2px;font-size:3.1rem;opacity:.35}
+.popcard .cover b{font-family:'Kanit';font-size:.98rem;font-weight:600;text-shadow:0 2px 8px rgba(0,0,0,.45);position:relative}
+.popcard .body{padding:10px 2px 2px}
+.popcard .amp{font-size:.74rem;color:var(--mut)}
+.popcard .bar{height:8px;background:#EDEAE0;border-radius:99px;margin:8px 0 4px;overflow:hidden}
+.popcard .bar i{display:block;height:100%;border-radius:99px}
+.popcard .nums{display:flex;justify-content:space-between;font-size:.78rem;color:var(--mut)}
+.popcard .nums b{color:var(--deep);font-family:'Kanit'}
+.popcard .chips{display:flex;gap:5px;flex-wrap:wrap;margin:9px 0}
+.mchip{font-size:.66rem;padding:3px 8px;border-radius:99px;font-weight:600}
+.popcard .acts{display:flex;gap:7px;margin-top:8px}
+.popcard .acts a{flex:1;text-align:center;font-family:'Kanit';font-size:.76rem;font-weight:500;text-decoration:none;
+  border-radius:9px;padding:8px 4px;transition:.15s}
+.a-nav{background:var(--deep);color:#fff}.a-nav:hover{background:var(--teal)}
+.a-food{background:#FBEEDB;color:#8A5A12;border:1px solid #F0D9AE}.a-food:hover{background:var(--gold);color:#fff}
+.legend{position:absolute;bottom:18px;left:14px;z-index:900;background:rgba(255,255,255,.94);border-radius:12px;
+  padding:10px 14px;font-size:.74rem;box-shadow:var(--shadow)}
+.legend b{font-family:'Kanit';font-size:.78rem;color:var(--deep);display:block;margin-bottom:6px}
+.legend .row{display:flex;align-items:center;gap:7px;margin:3px 0}
+.legend .sw{width:16px;height:11px;border-radius:3px;border:1px solid rgba(0,0,0,.12)}
+
+/* attraction showcase */
+.attr-scroll{display:grid;grid-auto-flow:column;grid-auto-columns:290px;gap:16px;overflow-x:auto;padding:6px 2px 18px;scroll-snap-type:x mandatory}
+.attr-scroll::-webkit-scrollbar{height:9px}
+.attr-scroll::-webkit-scrollbar-thumb{background:#CBD8D1;border-radius:99px}
+.acard{scroll-snap-align:start;background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;transition:transform .2s}
+.acard:hover{transform:translateY(-4px)}
+.acard .cov{height:132px;position:relative;display:flex;align-items:flex-end;padding:12px 16px;color:#fff}
+.acard .cov .em{position:absolute;right:10px;top:4px;font-size:4.4rem;opacity:.30;transform:rotate(8deg)}
+.acard .cov .no{position:absolute;left:12px;top:10px;font-family:'Kanit';font-weight:800;font-size:.72rem;background:rgba(0,0,0,.35);border-radius:99px;padding:3px 10px;letter-spacing:.08em}
+.acard .cov b{font-family:'Kanit';font-size:1.04rem;font-weight:600;text-shadow:0 2px 10px rgba(0,0,0,.5);position:relative;line-height:1.25}
+.acard .bd{padding:13px 16px 15px;display:flex;flex-direction:column;flex:1}
+.acard .amp{font-size:.72rem;color:var(--teal);font-weight:700;letter-spacing:.05em}
+.acard .rate{font-size:.72rem;color:#B07C1F;float:right}
+.acard p{font-size:.8rem;color:var(--mut);line-height:1.62;margin:7px 0 10px;flex:1}
+.acard .prog{height:7px;background:#EDEAE0;border-radius:99px;overflow:hidden}
+.acard .prog i{display:block;height:100%;border-radius:99px}
+.acard .pl{display:flex;justify-content:space-between;font-size:.7rem;color:var(--mut);margin:5px 0 10px}
+.acard .pl b{font-family:'Kanit';color:var(--deep)}
+.acard .acts{display:flex;gap:7px}
+.acard .acts a{flex:1;text-align:center;font-family:'Kanit';font-size:.74rem;font-weight:500;text-decoration:none;border-radius:9px;padding:8px 4px}
+
+/* charts */
+.chartbox{position:relative;height:330px}
+.chartbox.tall{height:420px}
+.don-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
+.don{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:16px;text-align:center}
+.don h3{font-size:.86rem;font-weight:500;color:var(--deep);margin-bottom:8px;min-height:2.4em;display:flex;align-items:center;justify-content:center}
+.don .cv{position:relative;height:170px}
+.don .mid{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+.don .mid b{font-family:'Kanit';font-size:1.5rem;color:var(--deep)}
+.don .mid span{font-size:.64rem;color:var(--mut)}
+
+/* matrix */
+table.matrix{width:100%;border-collapse:collapse;font-size:.83rem}
+.matrix th{background:var(--deep);color:#fff;font-family:'Kanit';font-weight:500;font-size:.76rem;padding:11px 10px;text-align:center;position:sticky;top:66px}
+.matrix th:first-child{text-align:left;border-radius:10px 0 0 0}.matrix th:last-child{border-radius:0 10px 0 0}
+.matrix td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:center;vertical-align:middle}
+.matrix td.nm{text-align:left}
+.matrix tr:nth-child(even) td{background:#FBFAF4}
+.matrix .cpn{font-family:'Kanit';font-weight:600;color:var(--deep);font-size:.84rem}
+.matrix .ampx{font-size:.7rem;color:var(--mut)}
+.chip{display:inline-block;padding:4px 11px;border-radius:99px;font-size:.7rem;font-weight:700;white-space:nowrap}
+.c-ok{background:#E1F2E7;color:#1D6E3F}.c-warn{background:#FCF0D8;color:#96660A}
+.c-bad{background:#FBE3E3;color:#A82F2F}.c-na{background:#EEF0EE;color:#7B8681}
+.tbl-scroll{overflow-x:auto}
+
+/* hotline strip */
+.hotline{margin:46px 0 0;background:linear-gradient(120deg,var(--deep) 0%,var(--teal) 100%);border-radius:var(--r);
+  color:#fff;padding:24px 26px;display:flex;gap:26px;align-items:center;flex-wrap:wrap;box-shadow:var(--shadow)}
+.hotline .big{font-family:'Kanit';font-weight:700;font-size:1.2rem}
+.hotline .big span{display:block;font-weight:300;font-size:.8rem;color:#BFD9CF}
+.hl-item{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:12px;padding:10px 18px}
+.hl-item b{font-family:'Kanit';font-size:1.3rem;color:var(--gold-soft)}
+.hl-item span{font-size:.76rem;color:#DCEDE5}
+
+footer{margin-top:46px;padding:26px 24px 34px;background:var(--deep2);color:#9DBFB2;font-size:.8rem;text-align:center;line-height:1.9}
+footer b{color:#fff;font-family:'Kanit';font-weight:500}
+
+/* update badge */
+.updated{font-size:.74rem;color:var(--mut)}
+.updated i{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ok);margin-right:5px;animation:pulse 2s infinite}
+
+/* ============ TV / PRESENTATION MODE ============ */
+body.tv .topbar .tb-btn:not(#btnTV){display:none}
+body.tv{font-size:18px}
+body.tv .kpi b{font-size:2.4rem}
+body.tv .hero h1{font-size:3rem}
+#tvBar{display:none;position:fixed;bottom:0;left:0;right:0;height:5px;background:rgba(255,255,255,.15);z-index:1500}
+#tvBar i{display:block;height:100%;width:0;background:var(--gold);transition:width .3s linear}
+body.tv #tvBar{display:block}
+
+@media(max-width:760px){
+  .topbar{flex-wrap:wrap;padding:10px 14px}
+  .tb-title b{font-size:.9rem}
+  .clock{display:none}
+  #map{height:430px}
+  section{padding:34px 0 6px}
+}
+@media print{.topbar,.legend,#tvBar{display:none}}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ TOP BAR ═══════════ -->
+<header class="topbar" id="topbar">
+  <img src="ตราหนองบัวลำภู.png" alt="ตราจังหวัดหนองบัวลำภู" onerror="this.style.display='none'">
+  <div class="tb-title">
+    <b>เที่ยวปลอดภัย หนองบัวลำภู</b>
+    <span>แดชบอร์ดติดตามการเสริมสร้างความปลอดภัยนักท่องเที่ยว • ศาลากลางจังหวัดหนองบัวลำภู</span>
+  </div>
+  <div class="tb-sp"></div>
+  <div class="clock" id="clock">—</div>
+  <select class="tb-btn" id="monthSel" title="เลือกรอบเดือน">
+    <option value="ALL">ทุกรอบเดือน (สะสม)</option>
+    <option value="2569-06">มิถุนายน 2569</option>
+    <option value="2569-07">กรกฎาคม 2569</option>
+    <option value="2569-08">สิงหาคม 2569</option>
+    <option value="2569-09">กันยายน 2569</option>
+  </select>
+  <button class="tb-btn" id="btnPNG">🖼 PNG</button>
+  <button class="tb-btn" id="btnPDF">📄 PDF</button>
+  <button class="tb-btn" id="btnTV">📺 โหมดนำเสนอ</button>
+  <a class="tb-btn gold" href="input.html">✎ กรอกข้อมูล</a>
+</header>
+<div id="tvBar"><i id="tvProg"></i></div>
+
+<div id="captureRoot">
+
+<!-- ═══════════ HERO ═══════════ -->
+<section class="hero" id="sec-hero" style="padding:0">
+  <div class="hero-in">
+    <div>
+      <div class="eyebrow">Nong Bua Lamphu Tourist Safety Operation</div>
+      <h1>ปฏิบัติการเฝ้าระวัง <em>12 จุดตรวจ</em><br>ในแหล่งท่องเที่ยวสำคัญทั่วจังหวัด</h1>
+      <p class="sub">ตามแผนปฏิบัติการเสริมสร้างความปลอดภัยนักท่องเที่ยวจังหวัดหนองบัวลำภู
+        ห้วงมิถุนายน – กันยายน ๒๕๖๙ เป้าหมายการออกตรวจ ลาดตระเวน และเฝ้าระวังเหตุ รวม <b style="color:var(--gold-soft)">3,600 ครั้ง</b>
+        พร้อมยกระดับ CCTV ป้าย 3 ภาษา อุปกรณ์ช่วยชีวิต และการซักซ้อมแผนเผชิญเหตุ</p>
+      <div class="verdict" id="verdict">
+        <div class="dot" style="background:var(--ok);box-shadow:0 0 12px var(--ok)"></div>
+        <div><b id="vTitle">กำลังโหลดข้อมูล…</b><small id="vSub">ประมวลผลสถานะเทียบแผน</small></div>
+      </div>
+      <div class="hero-mini">
+        <div class="hm"><b id="hmPatrol">–</b><span>ผลตรวจสะสม (ครั้ง)</span></div>
+        <div class="hm"><b id="hmMonth">–</b><span id="hmMonthLb">เดือนนี้ (ครั้ง)</span></div>
+        <div class="hm"><b id="hmPass">–</b><span>จุดตรวจตามแผน</span></div>
+        <div class="hm"><b id="hmScam">–</b><span>เหตุมิจฉาชีพคงค้าง</span></div>
+      </div>
+    </div>
+    <div class="gaugewrap">
+      <svg id="gauge" viewBox="0 0 480 300" aria-label="ความคืบหน้าผลการตรวจเทียบเป้าหมาย">
+        <defs>
+          <linearGradient id="arcbg" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stop-color="rgba(255,255,255,.14)"/><stop offset="1" stop-color="rgba(255,255,255,.10)"/>
+          </linearGradient>
+          <linearGradient id="arcfill" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stop-color="#F5C877"/><stop offset="1" stop-color="#E9A13B"/>
+          </linearGradient>
+          <radialGradient id="sun" cx=".5" cy=".5" r=".5">
+            <stop offset="0" stop-color="#FFE9BC"/><stop offset=".55" stop-color="#F5C877"/><stop offset="1" stop-color="#E9A13B"/>
+          </radialGradient>
+        </defs>
+        <path d="M60 260 A180 180 0 0 1 420 260" fill="none" stroke="url(#arcbg)" stroke-width="26" stroke-linecap="round"/>
+        <path id="arcFill" d="M60 260 A180 180 0 0 1 420 260" fill="none" stroke="url(#arcfill)" stroke-width="26"
+              stroke-linecap="round" stroke-dasharray="565.5" stroke-dashoffset="565.5" style="transition:stroke-dashoffset 1.4s cubic-bezier(.2,.8,.2,1)"/>
+        <g id="ticks"></g>
+        <circle id="sunDot" cx="60" cy="260" r="17" fill="url(#sun)" style="filter:drop-shadow(0 0 16px rgba(245,200,119,.9));transition:cx 1.4s cubic-bezier(.2,.8,.2,1),cy 1.4s cubic-bezier(.2,.8,.2,1)"/>
+        <text x="52" y="292" fill="#BFD9CF" font-size="13" font-family="Kanit">0</text>
+        <text x="398" y="292" fill="#BFD9CF" font-size="13" font-family="Kanit">3,600</text>
+      </svg>
+      <div class="gauge-center">
+        <b id="gPct">0<i>%</i></b>
+        <span id="gLbl">ของเป้าหมายรวมทั้งห้วง</span>
+      </div>
+    </div>
+  </div>
+  <svg class="mountains" viewBox="0 0 1440 110" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 110 L0 74 L140 30 L300 84 L430 18 L560 78 L720 8 L880 80 L1020 34 L1180 88 L1320 44 L1440 78 L1440 110 Z" fill="rgba(11,42,36,.55)"/>
+    <path d="M0 110 L0 92 L170 58 L340 98 L520 44 L700 96 L860 52 L1040 100 L1220 62 L1440 96 L1440 110 Z" fill="#F5F2E9"/>
+  </svg>
+</section>
+
+<div class="wrap">
+
+<!-- ═══════════ KPI ═══════════ -->
+<section id="sec-kpi" style="padding-top:26px">
+  <div class="sec-head">
+    <span class="tag">Executive Summary</span>
+    <h2>ภาพรวมผลการดำเนินงาน</h2>
+    <div class="tb-sp"></div>
+    <span class="updated" id="lastUpdate"><i></i>กำลังเชื่อมต่อฐานข้อมูล…</span>
+  </div>
+  <div class="kpis">
+    <div class="kpi"><span class="ic">🛡️</span><b id="kPatrol">–</b><span>ผลตรวจ/ลาดตระเวนสะสม (ครั้ง)</span><span class="sub2" id="kPatrolSub">เป้าหมาย 3,600 ครั้ง</span></div>
+    <div class="kpi gold"><span class="ic">🎯</span><b id="kPct">–<small>%</small></b><span>ความคืบหน้าเทียบเป้าหมายรวม</span><span class="sub2" id="kPaceSub">–</span></div>
+    <div class="kpi"><span class="ic">📍</span><b id="kPass">–<small>/12</small></b><span>จุดตรวจดำเนินการตามแผน (Pace)</span><span class="sub2" id="kPassSub">–</span></div>
+    <div class="kpi"><span class="ic">📹</span><b id="kCctv">–<small>%</small></b><span>CCTV/ไฟส่องสว่างพร้อม 24 ชม.</span><span class="sub2">มาตรการที่ 1.2</span></div>
+    <div class="kpi"><span class="ic">🈺</span><b id="kSign">–<small>%</small></b><span>ติดตั้งป้าย 3 ภาษาแล้วเสร็จ</span><span class="sub2">มาตรการที่ 2.1</span></div>
+    <div class="kpi"><span class="ic">🚑</span><b id="kDrill">–<small>%</small></b><span>ซักซ้อมแผนเผชิญเหตุแล้ว</span><span class="sub2">มาตรการที่ 3.2</span></div>
+    <div class="kpi rose" id="kScamCard"><span class="ic">⚠️</span><b id="kScam">–</b><span>เหตุมิจฉาชีพ/หลอกลวง (คงค้าง)</span><span class="sub2">มาตรการที่ 4</span></div>
+  </div>
+</section>
+
+<!-- ═══════════ MAP + PACE ═══════════ -->
+<section id="sec-map">
+  <div class="sec-head">
+    <span class="tag">Safety × Tourism Map</span>
+    <h2>แผนที่ 12 จุดตรวจ • ปักหมุดชวนเที่ยว</h2>
+    <p>สีพื้นอำเภอ = ความคืบหน้าผลตรวจเทียบเป้าหมาย • คลิกหมุดเพื่อดูรายละเอียดแหล่งท่องเที่ยว นำทาง และค้นหาร้านอาหารใกล้เคียง</p>
+  </div>
+  <div class="grid2">
+    <div class="card" style="padding:12px;position:relative">
+      <div id="map"></div>
+      <div class="legend">
+        <b>ความคืบหน้าเทียบเป้า (อำเภอ)</b>
+        <div class="row"><span class="sw" style="background:#1B6B5A"></span> ≥ 100%</div>
+        <div class="row"><span class="sw" style="background:#5EA88F"></span> 75 – 99%</div>
+        <div class="row"><span class="sw" style="background:#A9CBBB"></span> 50 – 74%</div>
+        <div class="row"><span class="sw" style="background:#E7C98F"></span> 25 – 49%</div>
+        <div class="row"><span class="sw" style="background:#E7A98F"></span> &lt; 25%</div>
+      </div>
+    </div>
+    <div class="card">
+      <h3 class="disp" style="color:var(--deep);font-weight:600;margin-bottom:4px">ผลตรวจรายจุดเทียบเป้าหมาย</h3>
+      <p style="font-size:.78rem;color:var(--mut);margin-bottom:10px" id="cpChartCap">สะสมทั้งห้วง มิ.ย. – ก.ย. 2569</p>
+      <div class="chartbox tall"><canvas id="cpChart"></canvas></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ ATTRACTIONS ═══════════ -->
+<section id="sec-attr">
+  <div class="sec-head">
+    <span class="tag">Amazing Nong Bua Lamphu</span>
+    <h2>เที่ยวมั่นใจ 12 หมุดหมาย ปลอดภัยทุกจุดตรวจ</h2>
+    <p>ทุกจุดตรวจคือแหล่งท่องเที่ยว/จุดบริการสำคัญของจังหวัด — เลื่อนชมและกด "นำทาง" ออกเดินทางได้ทันที</p>
+  </div>
+  <div class="attr-scroll" id="attrScroll"></div>
+</section>
+
+<!-- ═══════════ TREND ═══════════ -->
+<section id="sec-trend">
+  <div class="sec-head">
+    <span class="tag">Trend & Momentum</span>
+    <h2>แนวโน้มผลการตรวจรายเดือน</h2>
+    <p>เทียบผลปี 2569 กับฐานข้อมูลจริงห้วงเดียวกันของปี 2568 (ภ.จว.หนองบัวลำภู) และเส้นเป้าหมายเฉลี่ยรายเดือน</p>
+  </div>
+  <div class="grid2b">
+    <div class="card">
+      <h3 class="disp" style="color:var(--deep);font-weight:600;margin-bottom:10px">เดือนนี้ ใครนำ ใครต้องเร่ง</h3>
+      <div id="raceList"></div>
+    </div>
+    <div class="card">
+      <div class="chartbox"><canvas id="monthChart"></canvas></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ MEASURES ═══════════ -->
+<section id="sec-measure">
+  <div class="sec-head">
+    <span class="tag">4 Measures Tracking</span>
+    <h2>สถานะความพร้อมตามมาตรการ</h2>
+    <p>ข้อมูลสถานะล่าสุดจากเจ้าหน้าที่ประจำจุดตรวจ (แก้ไขปรับปรุงได้แบบเรียลไทม์ผ่านระบบกรอกข้อมูล)</p>
+  </div>
+  <div class="don-grid" id="donGrid">
+    <div class="don"><h3>📹 CCTV / ไฟส่องสว่าง 24 ชม.<br>(มาตรการ 1.2)</h3><div class="cv"><canvas id="d1"></canvas><div class="mid"><b id="d1v">–</b><span>จาก 12 จุด</span></div></div></div>
+    <div class="don"><h3>🈺 ป้ายเตือน/บอกทาง 3 ภาษา<br>(มาตรการ 2.1)</h3><div class="cv"><canvas id="d2"></canvas><div class="mid"><b id="d2v">–</b><span>จาก 12 จุด</span></div></div></div>
+    <div class="don"><h3>🛟 ไลฟ์การ์ด/อุปกรณ์ช่วยชีวิต<br>(มาตรการ 2.1)</h3><div class="cv"><canvas id="d3"></canvas><div class="mid"><b id="d3v">–</b><span>จาก 12 จุด</span></div></div></div>
+    <div class="don"><h3>🚑 ซักซ้อมแผนเผชิญเหตุ<br>(มาตรการ 3.2)</h3><div class="cv"><canvas id="d4"></canvas><div class="mid"><b id="d4v">–</b><span>จาก 12 จุด</span></div></div></div>
+  </div>
+
+  <div class="card tbl-scroll" style="margin-top:18px">
+    <table class="matrix" id="matrix">
+      <thead><tr>
+        <th style="min-width:230px">จุดตรวจ / แหล่งท่องเที่ยว</th>
+        <th>ผลตรวจ<br>สะสม/เป้า</th>
+        <th>CCTV/ไฟส่องสว่าง<br>ม.1.2</th>
+        <th>ป้าย 3 ภาษา<br>ม.2.1</th>
+        <th>ไลฟ์การ์ด/อุปกรณ์<br>ม.2.1</th>
+        <th>ซ้อมแผนเผชิญเหตุ<br>ม.3.2</th>
+        <th>เหตุมิจฉาชีพ<br>ม.4</th>
+      </tr></thead>
+      <tbody id="matrixBody"></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════════ HOTLINE ═══════════ -->
+<div class="hotline" id="sec-hotline">
+  <div class="big">พบเหตุ แจ้งได้ทันที<span>มาตรการ 4.2 ประชาสัมพันธ์ช่องทางร้องเรียนและขอความช่วยเหลือ</span></div>
+  <div class="hl-item"><b>1155</b><span>สายด่วนตำรวจท่องเที่ยว<br>Tourist Police Hotline</span></div>
+  <div class="hl-item"><b>02-134-4077</b><span>สายด่วนช่วยเหลือนักท่องเที่ยว<br>Tourist Assistance Center</span></div>
+  <div class="hl-item"><b>1669</b><span>เจ็บป่วยฉุกเฉิน<br>Emergency Medical</span></div>
+  <div class="hl-item"><b>191</b><span>เหตุด่วนเหตุร้าย<br>Police</span></div>
+</div>
+
+</div><!-- /wrap -->
+
+<footer>
+  <b>แดชบอร์ดเสริมสร้างความปลอดภัยนักท่องเที่ยว จังหวัดหนองบัวลำภู</b><br>
+  ตามแผนปฏิบัติการแนบท้ายคำสั่งจังหวัดหนองบัวลำภู ห้วงมิถุนายน – กันยายน ๒๕๖๙ • เป้าหมายรวม 3,600 ครั้ง<br>
+  หน่วยงานหลัก: ตำรวจภูธรจังหวัดหนองบัวลำภู • สถานีตำรวจท่องเที่ยว 1 กก.1 บก.ทท.2 • สำนักงานการท่องเที่ยวและกีฬาจังหวัด<br>
+  จัดทำระบบโดย สำนักงานสถิติจังหวัดหนองบัวลำภู
+</footer>
+
+</div><!-- /captureRoot -->
+
+<script>
+/* ════════════════════════════════════════════════════════════
+   CONFIG — แก้ค่าที่นี่จุดเดียว
+   ════════════════════════════════════════════════════════════ */
+const GAS_URL = "";      // ← วาง URL Web App (/exec) จาก Apps Script; เว้นว่าง = โหมดสาธิต
+const PERIOD  = { start: "2026-06-01", end: "2026-09-30", label: "มิ.ย. – ก.ย. 2569" };
+const TOTAL_TARGET = 3600;
+
+/* 12 จุดตรวจ — พิกัดจาก Google Places (CP4 พิกัดโดยประมาณ ปรับแก้ได้) */
+const CPS = [
+{id:"CP1", no:1, name:"วัดถ้ำสุวรรณคูหา", amp:"สุวรรณคูหา", ampCode:"3905", target:320, lat:17.60754, lng:102.28273,
+ type:"วัด/ถ้ำ", em:"🛕", g:["#7A4F9E","#4A2C6B"], rate:"4.5", pid:"ChIJE6z8CAD3IzERUKQ4-DRypnU",
+ desc:"วัดถ้ำเก่าแก่ในเพิงผาหินปูน แหล่งจารึกโบราณสมัยล้านช้าง บรรยากาศร่มรื่นเงียบสงบ มีถ้ำ สระน้ำ และลานหินให้เดินชม",
+ hi:["จารึกโบราณ","ถ้ำหินปูน","สายบุญสายมู"]},
+{id:"CP2", no:2, name:"วัดถ้ำเอราวัณ", amp:"นาวัง", ampCode:"3906", target:200, lat:17.34531, lng:102.01863,
+ type:"วัด/ถ้ำ", em:"⛰️", g:["#2E8B74","#123C33"], rate:"4.6", pid:"ChIJiTrLNlFeITERE4_8q_pWMdI",
+ desc:"ตำนานรักนางผมหอม พิชิตบันได 600 ขั้นสู่พระพุทธรูปใหญ่ปากถ้ำ เดินทะลุถ้ำสู่จุดชมวิวหลังเขา หนึ่งในถ้ำที่สวยที่สุดของอีสาน",
+ hi:["บันได 600 ขั้น","ถ้ำทะลุภูเขา","จุดชมวิว"]},
+{id:"CP3", no:3, name:"จุดตรวจ ปตท.ม่วงแก้ว", amp:"ศรีบุญเรือง", ampCode:"3904", target:230, lat:16.95567, lng:102.26413,
+ type:"จุดบริการ", em:"⛽", g:["#3D6FB4","#1F3E6E"], rate:"", pid:"ChIJiTry8HrNIzERYJrvlj2joHM",
+ desc:"จุดพักรถและจุดตรวจสกัดบนเส้นทางหลักสายศรีบุญเรือง อำนวยความสะดวกและดูแลความปลอดภัยผู้เดินทาง 24 ชั่วโมง",
+ hi:["จุดพักรถ 24 ชม.","เส้นทางหลัก"]},
+{id:"CP4", no:4, name:"จุดตรวจ ปตท.สวนสวรรค์", amp:"ศรีบุญเรือง", ampCode:"3904", target:370, lat:16.97200, lng:102.26000,
+ type:"จุดบริการ", em:"⛽", g:["#3D6FB4","#1F3E6E"], rate:"", pid:"",
+ desc:"จุดพักรถและจุดตรวจสกัดประจำอำเภอศรีบุญเรือง เฝ้าระวังเส้นทางสัญจรของนักท่องเที่ยวและประชาชน",
+ hi:["จุดพักรถ","จุดสกัดหลัก"]},
+{id:"CP5", no:5, name:"สวนสาธารณะเขื่อนบั้งไฟแสน", amp:"ศรีบุญเรือง", ampCode:"3904", target:250, lat:16.96139, lng:102.28255,
+ type:"สวน/ริมน้ำ", em:"🌅", g:["#E9812F","#B34A17"], rate:"4.7", pid:"ChIJ0T6ZKsbNIzER0T_PHDrbnJQ",
+ desc:"แลนด์มาร์กพักผ่อนริมอ่างเก็บน้ำของชาวศรีบุญเรือง ชมพระอาทิตย์ตก นั่งชิลร้านริมน้ำ หมูกระทะ และลานออกกำลังกาย",
+ hi:["ซันเซ็ตริมน้ำ","ร้านนั่งชิล","วิ่ง-ปั่น"]},
+{id:"CP6", no:6, name:"น้ำตกเฒ่าโต้", amp:"เมืองหนองบัวลำภู", ampCode:"3901", target:250, lat:17.23087, lng:102.46256,
+ type:"น้ำตก", em:"💧", g:["#2E9BB0","#155E71"], rate:"3.9", pid:"ChIJMWN2R3W_IzERAbzfaiyoydM",
+ desc:"น้ำตกกลางป่าเบญจพรรณ ห่างตัวเมืองเพียง 6.5 กม. สักการะศาลปู่หลุบ–หลวงปู่ใหญ่ เดินป่าเส้นสั้นชมธรรมชาติ เหมาะปิกนิกครอบครัว",
+ hi:["ใกล้เมือง 6.5 กม.","ศาลปู่หลุบ","ปิกนิก"]},
+{id:"CP7", no:7, name:"พิพิธภัณฑ์หอยหิน 150 ล้านปี", amp:"เมืองหนองบัวลำภู", ampCode:"3901", target:230, lat:17.24404, lng:102.51350,
+ type:"พิพิธภัณฑ์", em:"🦖", g:["#9E6B2F","#5E3A12"], rate:"4.3", pid:"ChIJw3Qw6HG-IzERzfRZftrLLGU",
+ desc:"จูราสสิกเมืองลุ่มภู! ฟอสซิลหอย 150 ล้านปี พร้อมไดโนพาร์คหุ่นไดโนเสาร์ขยับได้-ส่งเสียงได้ และโรงหนัง 5 มิติ เด็ก ๆ ห้ามพลาด",
+ hi:["ไดโนพาร์ค","ฟอสซิลจริง","โรงหนัง 5D"]},
+{id:"CP8", no:8, name:"ภูพานน้อย", amp:"เมืองหนองบัวลำภู", ampCode:"3901", target:120, lat:17.19226, lng:102.47553,
+ type:"จุดชมวิว", em:"🌄", g:["#5C8A46","#2C4F1E"], rate:"4.5", pid:"ChIJo84t-S6_IzERyAk9DU-rzTc",
+ desc:"จุดชมวิวหลักของจังหวัด มองเห็นตัวเมืองหนองบัวลำภูสุดสายตา เช้าชมทะเลหมอก เย็นชมแสงเมือง ห่างตัวเมืองเพียง 12 นาที",
+ hi:["ทะเลหมอก","วิวเมือง 180°","ถนนลอยฟ้า"]},
+{id:"CP9", no:9, name:"สวนสาธารณะหนองน้ำนันทจันทร์", amp:"นากลาง", ampCode:"3902", target:250, lat:17.30291, lng:102.20780,
+ type:"สวน/ริมน้ำ", em:"🌳", g:["#3F9D6B","#1D5C3C"], rate:"4.4", pid:"ChIJK1hb3FLnIzERuhFTPrMnh9Q",
+ desc:"ปอดสีเขียวของชาวนากลาง สวนริมหนองน้ำบรรยากาศดี ลานกีฬา ลู่วิ่ง–ปั่นจักรยาน จุดนัดพบยามเย็นของคนทุกวัย",
+ hi:["ลู่วิ่งริมน้ำ","ลานกีฬา"]},
+{id:"CP10", no:10, name:"หลวงพ่อใหญ่ วัดศิริชัยเจริญธรรม", amp:"โนนสัง", ampCode:"3903", target:410, lat:16.86669, lng:102.56994,
+ type:"วัด", em:"🙏", g:["#C88A2B","#8A5A12"], rate:"4.6", pid:"ChIJIRwinuRMIjERcpl07F1ato4",
+ desc:"สักการะหลวงพ่อใหญ่ พระพุทธรูปศักดิ์สิทธิ์คู่บ้านโนนสัง ขอพรเสริมสิริมงคล วัดสงบร่มเย็น เจ้าอาวาสใจดีเป็นกันเอง",
+ hi:["ขอพรหลวงพ่อใหญ่","สายบุญ"]},
+{id:"CP11", no:11, name:"สวนสุขภาพโนนสัง", amp:"โนนสัง", ampCode:"3903", target:420, lat:16.86379, lng:102.57445,
+ type:"สวน", em:"🏃", g:["#3F9D6B","#1D5C3C"], rate:"", pid:"ChIJVVVVRv1MIjERDau-fDHCITo",
+ desc:"สวนสุขภาพประจำชุมชนโนนสัง พื้นที่ออกกำลังกายและกิจกรรมยามเย็นที่คึกคักที่สุดของอำเภอ",
+ hi:["ออกกำลังกาย","กิจกรรมชุมชน"]},
+{id:"CP12", no:12, name:"สะพานเชื่อมฮักบ้านตาดไฮ", amp:"โนนสัง", ampCode:"3903", target:550, lat:16.90507, lng:102.41664,
+ type:"สะพาน/ริมเขื่อน", em:"🌉", g:["#D96C8A","#8F3B55"], rate:"4.5", pid:"ChIJ8ccvjmU1IjERSMXosAn3Wkk",
+ desc:"อันซีนโนนสัง! สะพานไม้ไผ่ทอดข้ามผืนน้ำเขื่อนอุบลรัตน์สู่เกาะกลางน้ำ นั่งแพ กินปลาเผา นอนเปล ชมวิวภูเขาโอบล้อม 360 องศา",
+ hi:["สะพานไม้ไผ่","แพร้านอาหาร","วิว 360°"]},
+];
+
+/* ฐานข้อมูลจริงปี 2568 (ภ.จว.นภ.) */
+const HIST68 = { "มี.ค.":441, "เม.ย.":478, "พ.ค.":669, "มิ.ย.":1026, "ก.ค.":993, "ส.ค.":880 };
+const MONTHS = [ {k:"2569-06", s:"มิ.ย. 69", h:1026}, {k:"2569-07", s:"ก.ค. 69", h:993},
+                 {k:"2569-08", s:"ส.ค. 69", h:880}, {k:"2569-09", s:"ก.ย. 69", h:null} ];
+
+/* ── DEMO DATA (แสดงเมื่อยังไม่ตั้งค่า GAS_URL) ── */
+const DEMO = (()=> {
+  const patrols=[]; const seed=[9,7,8,11,8,7,6,4,8,12,13,16];
+  CPS.forEach((c,i)=>{ // มิ.ย. 30 วัน + ก.ค. 1-2
+    for(let d=1;d<=30;d+=3) patrols.push({id:"D"+i+d, date:`2026-06-${String(d).padStart(2,"0")}`, month:"2569-06", cp:c.id, count:seed[i]+((d*i)%4), note:"", by:c.id});
+    patrols.push({id:"Dx"+i, date:"2026-07-02", month:"2569-07", cp:c.id, count:seed[i], note:"", by:c.id});
+  });
+  const M=(a,b,c,d,e,f)=>({cctv:a,signs:b,lifeguard:c,drill:d,scam:e,scamDetail:f||"",updated:"2026-07-02 16:40"});
+  const OK1="พร้อมใช้งานตลอด 24 ชั่วโมง 100%", P1="พร้อมใช้งานบางส่วน (อยู่ระหว่างซ่อมแซม/ปรับปรุง)", N1="ไม่มีระบบ CCTV หรือไฟส่องสว่างในพื้นที่";
+  const OK2="ดำเนินการติดตั้งเรียบร้อยแล้ว ครบถ้วนชัดเจน", P2="อยู่ระหว่างจัดทำ/ยังไม่ครบ 3 ภาษา", N2="ยังไม่ได้ดำเนินการ";
+  const OK3="มีครบถ้วนและเพียงพอ", P3="มีบางส่วน แต่ยังไม่เพียงพอ", N3="ไม่มี (ไม่ใช่แหล่งท่องเที่ยวทางน้ำ)";
+  const OK4="ซักซ้อมเรียบร้อยแล้ว (อย่างน้อย 1 ครั้งในปีนี้)", P4="อยู่ระหว่างการประสานงาน/วางแผน", N4="ยังไม่ได้ดำเนินการ";
+  return { ok:true, serverTime:"โหมดสาธิต (ยังไม่เชื่อม Google Sheets)", patrols,
+    measures:{
+      CP1:M(OK1,OK2,N3,OK4,"ไม่พบเหตุการณ์"), CP2:M(OK1,P2,N3,OK4,"ไม่พบเหตุการณ์"),
+      CP3:M(OK1,OK2,N3,P4,"ไม่พบเหตุการณ์"),  CP4:M(P1,P2,N3,P4,"ไม่พบเหตุการณ์"),
+      CP5:M(OK1,OK2,P3,OK4,"ไม่พบเหตุการณ์"), CP6:M(P1,P2,P3,OK4,"พบเหตุการณ์ (ระบุรายละเอียด)","ขายของเกินราคาบริเวณลานจอดรถ อยู่ระหว่างตักเตือน"),
+      CP7:M(OK1,OK2,N3,OK4,"ไม่พบเหตุการณ์"), CP8:M(P1,P2,N3,P4,"ไม่พบเหตุการณ์"),
+      CP9:M(OK1,OK2,OK3,OK4,"ไม่พบเหตุการณ์"),CP10:M(OK1,OK2,N3,OK4,"ไม่พบเหตุการณ์"),
+      CP11:M(OK1,P2,N3,P4,"ไม่พบเหตุการณ์"), CP12:M(OK1,OK2,P3,OK4,"ไม่พบเหตุการณ์")
+    }};
+})();
+
+/* ════════════════════ STATE / UTIL ════════════════════ */
+let DATA=null, map, geoLayer, markers=[], charts={};
+const $=id=>document.getElementById(id);
+const fmt=n=>Number(n).toLocaleString("th-TH");
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const AMPS={"3901":"เมืองหนองบัวลำภู","3902":"นากลาง","3903":"โนนสัง","3904":"ศรีบุญเรือง","3905":"สุวรรณคูหา","3906":"นาวัง"};
+
+function jsonp(params){
+  return new Promise((res,rej)=>{
+    if(!GAS_URL){ res(DEMO); return; }
+    const cb="cb"+Date.now()+Math.floor(Math.random()*999);
+    window[cb]=d=>{ delete window[cb]; s.remove(); res(d); };
+    const q=Object.entries({...params,callback:cb}).map(([k,v])=>k+"="+encodeURIComponent(v)).join("&");
+    const s=document.createElement("script");
+    s.src=GAS_URL+"?"+q;
+    s.onerror=()=>{ delete window[cb]; s.remove(); rej(new Error("เชื่อมต่อไม่สำเร็จ")); };
+    document.body.appendChild(s);
+    setTimeout(()=>{ if(window[cb]){ delete window[cb]; s.remove(); rej(new Error("หมดเวลาเชื่อมต่อ")); } },30000);
+  });
+}
+
+/* pace: สัดส่วนเวลาในห้วงที่ผ่านไปแล้ว */
+function paceRatio(){
+  const s=new Date(PERIOD.start), e=new Date(PERIOD.end), now=new Date();
+  return clamp((now-s)/(e-s),0,1);
+}
+function sumPatrols(month,cp){
+  return DATA.patrols.filter(p=>(month==="ALL"||p.month===month)&&(!cp||p.cp===cp))
+    .reduce((s,p)=>s+p.count,0);
+}
+function statusOf(pct,pace){
+  if(pct>=100) return {t:"บรรลุเป้าหมาย",c:"var(--ok)",cls:"c-ok"};
+  if(pct>=pace*100) return {t:"ตามแผน",c:"var(--ok)",cls:"c-ok"};
+  if(pct>=pace*100*0.75) return {t:"ใกล้เคียงแผน",c:"var(--warn)",cls:"c-warn"};
+  return {t:"ต้องเร่งรัด",c:"var(--bad)",cls:"c-bad"};
+}
+/* จำแนกคำตอบมาตรการเป็น ok / warn / bad / na */
+function grade(v,measure){
+  if(!v) return {g:"na",short:"ยังไม่รายงาน"};
+  if(measure==="lifeguard"&&v.indexOf("ไม่ใช่แหล่งท่องเที่ยวทางน้ำ")>-1) return {g:"na",short:"ไม่เกี่ยวข้อง"};
+  if(v.indexOf("100%")>-1||v.indexOf("เรียบร้อย")>-1||v.indexOf("ครบถ้วนและเพียงพอ")>-1||v==="ไม่พบเหตุการณ์") return {g:"ok",short:shortLbl(v)};
+  if(v.indexOf("บางส่วน")>-1||v.indexOf("ระหว่าง")>-1) return {g:"warn",short:shortLbl(v)};
+  return {g:"bad",short:shortLbl(v)};
+}
+function shortLbl(v){
+  const m={"พร้อมใช้งานตลอด 24 ชั่วโมง 100%":"พร้อม 100%","พร้อมใช้งานบางส่วน (อยู่ระหว่างซ่อมแซม/ปรับปรุง)":"พร้อมบางส่วน",
+  "ไม่มีระบบ CCTV หรือไฟส่องสว่างในพื้นที่":"ไม่มีระบบ","ดำเนินการติดตั้งเรียบร้อยแล้ว ครบถ้วนชัดเจน":"ติดตั้งครบ",
+  "อยู่ระหว่างจัดทำ/ยังไม่ครบ 3 ภาษา":"กำลังจัดทำ","ยังไม่ได้ดำเนินการ":"ยังไม่ดำเนินการ","มีครบถ้วนและเพียงพอ":"ครบถ้วน",
+  "มีบางส่วน แต่ยังไม่เพียงพอ":"ยังไม่พอ","ไม่มี (ไม่ใช่แหล่งท่องเที่ยวทางน้ำ)":"ไม่เกี่ยวข้อง",
+  "ซักซ้อมเรียบร้อยแล้ว (อย่างน้อย 1 ครั้งในปีนี้)":"ซ้อมแล้ว","อยู่ระหว่างการประสานงาน/วางแผน":"กำลังวางแผน",
+  "ไม่พบเหตุการณ์":"ไม่พบเหตุ","พบเหตุการณ์ (ระบุรายละเอียด)":"พบเหตุ ⚠"};
+  return m[v]||v;
+}
+
+/* ════════════════════ RENDER ════════════════════ */
+function renderAll(){
+  const month=$("monthSel").value;
+  const pace=paceRatio();
+  const cum=sumPatrols("ALL");                    // ทบยอดทั้งห้วง (verdict อิงสะสมเสมอ)
+  const sel=sumPatrols(month);
+  const pct=TOTAL_TARGET?cum/TOTAL_TARGET*100:0;
+  const st=statusOf(pct,pace);
+
+  /* hero */
+  $("hmPatrol").textContent=fmt(cum);
+  $("hmMonth").textContent=fmt(month==="ALL"?sumPatrols(currentMonthKey()):sel);
+  $("hmMonthLb").textContent=month==="ALL"?"เดือนปัจจุบัน (ครั้ง)":"รอบเดือนที่เลือก (ครั้ง)";
+  const passCnt=CPS.filter(c=>{const p=sumPatrols("ALL",c.id)/c.target*100;return p>=pace*100||p>=100;}).length;
+  $("hmPass").textContent=passCnt+"/12";
+  const scamOpen=CPS.filter(c=>{const m=DATA.measures[c.id];return m&&m.scam&&m.scam.indexOf("พบเหตุการณ์")>-1;}).length;
+  $("hmScam").textContent=scamOpen;
+  $("vTitle").textContent=`ผลตรวจสะสม ${fmt(cum)} ครั้ง (${pct.toFixed(1)}%) — ${st.t}`;
+  $("vSub").textContent=`เวลาผ่านไป ${(pace*100).toFixed(0)}% ของห้วง ${PERIOD.label} • เป้าหมายรวม ${fmt(TOTAL_TARGET)} ครั้ง`;
+  document.querySelector("#verdict .dot").style.background=st.c;
+  document.querySelector("#verdict .dot").style.boxShadow=`0 0 12px ${st.c}`;
+
+  /* gauge */
+  const L=565.5, r=clamp(pct/100,0,1);
+  $("arcFill").style.strokeDashoffset=L*(1-r);
+  const ang=Math.PI*(1-r), cx=240+180*Math.cos(ang), cy=260-180*Math.sin(ang);
+  $("sunDot").setAttribute("cx",cx); $("sunDot").setAttribute("cy",cy);
+  animNum($("gPct"),pct,1,"<i>%</i>");
+  $("gLbl").textContent=`ของเป้าหมายรวมทั้งห้วง (${fmt(cum)} / ${fmt(TOTAL_TARGET)} ครั้ง)`;
+
+  /* KPI */
+  $("kPatrol").textContent=fmt(month==="ALL"?cum:sel);
+  $("kPatrolSub").textContent=month==="ALL"?`เป้าหมายรวม ${fmt(TOTAL_TARGET)} ครั้ง`:`เฉพาะรอบ ${monthLabel(month)} • เป้าเฉลี่ย/เดือน ${fmt(TOTAL_TARGET/4)} ครั้ง`;
+  $("kPct").innerHTML=pct.toFixed(1)+"<small>%</small>";
+  $("kPaceSub").textContent=`${st.t} (เวลาแผนผ่านไป ${(pace*100).toFixed(0)}%)`;
+  $("kPass").innerHTML=passCnt+"<small>/12</small>";
+  $("kPassSub").textContent=passCnt>=9?"ภาพรวมเดินหน้าตามแผน":"มีจุดตรวจต้องเร่งรัด "+(12-passCnt)+" จุด";
+  const pctOf=(m,ok)=>Math.round(CPS.filter(c=>{const x=DATA.measures[c.id];return x&&grade(x[m],m).g==="ok";}).length/12*100);
+  $("kCctv").innerHTML=pctOf("cctv")+"<small>%</small>";
+  $("kSign").innerHTML=pctOf("signs")+"<small>%</small>";
+  $("kDrill").innerHTML=pctOf("drill")+"<small>%</small>";
+  $("kScam").textContent=scamOpen;
+  $("kScamCard").className="kpi "+(scamOpen>0?"bad":"rose");
+
+  $("cpChartCap").textContent=month==="ALL"?`สะสมทั้งห้วง ${PERIOD.label}`:`เฉพาะรอบ ${monthLabel(month)} เทียบเป้าเฉลี่ยรายเดือน`;
+
+  /* กันพัง: หากไลบรารีภายนอก (Leaflet/Chart.js) โหลดไม่ทัน ส่วนอื่นยังแสดงผลครบ */
+  const safe=f=>{try{f();}catch(e){console.warn("render skip:",e.message);}};
+  safe(()=>renderMap(month,pace));
+  safe(()=>renderCards(pace));
+  safe(()=>renderCpChart(month,pace));
+  safe(()=>renderMonthChart());
+  safe(()=>renderRace(pace));
+  safe(()=>renderDonuts());
+  safe(()=>renderMatrix(pace));
+}
+
+function currentMonthKey(){
+  const n=new Date(); return (n.getFullYear()+543)+"-"+String(n.getMonth()+1).padStart(2,"0");
+}
+function monthLabel(k){ const m=MONTHS.find(x=>x.k===k); return m?m.s:k; }
+function animNum(el,val,dec,suffix){
+  const from=parseFloat(el.textContent)||0, t0=performance.now();
+  (function step(t){ const p=clamp((t-t0)/900,0,1), v=from+(val-from)*(1-Math.pow(1-p,3));
+    el.innerHTML=v.toFixed(dec)+(suffix||""); if(p<1)requestAnimationFrame(step); })(t0);
+}
+
+/* ── MAP ── */
+function ampColor(p){ return p>=100?"#1B6B5A":p>=75?"#5EA88F":p>=50?"#A9CBBB":p>=25?"#E7C98F":"#E7A98F"; }
+function renderMap(month,pace){
+  if(!map){
+    map=L.map("map",{scrollWheelZoom:false}).setView([17.13,102.36],10);
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+      {attribution:"© OpenStreetMap © CARTO",maxZoom:18}).addTo(map);
+  }
+  const byAmp={};
+  Object.keys(AMPS).forEach(a=>{
+    const cps=CPS.filter(c=>c.ampCode===a);
+    const got=cps.reduce((s,c)=>s+sumPatrols("ALL",c.id),0);
+    const tg=cps.reduce((s,c)=>s+c.target,0);
+    byAmp[a]={pct:tg?got/tg*100:0,got,tg};
+  });
+  if(geoLayer) geoLayer.remove();
+  geoLayer=L.geoJSON(NB_GEO,{
+    style:f=>({color:"#0B2A24",weight:1.6,fillColor:ampColor(byAmp[f.properties.amp_code].pct),fillOpacity:.55}),
+    onEachFeature:(f,l)=>{
+      const a=byAmp[f.properties.amp_code];
+      l.bindTooltip(`<b style="font-family:Kanit">อ.${f.properties.amp_th}</b><br>ผลตรวจ ${fmt(a.got)} / ${fmt(a.tg)} ครั้ง (${a.pct.toFixed(0)}%)`,{sticky:true});
+    }
+  }).addTo(map);
+
+  markers.forEach(m=>m.remove()); markers=[];
+  CPS.forEach(c=>{
+    const got=sumPatrols("ALL",c.id), p=got/c.target*100, st=statusOf(p,pace);
+    const icon=L.divIcon({className:"", iconSize:[38,38], iconAnchor:[19,34],
+      html:`<div class="cp-pin" style="background:linear-gradient(135deg,${c.g[0]},${c.g[1]})"><span>${c.em}</span></div>`});
+    const m=DATA.measures[c.id]||{};
+    const chips=[["📹",grade(m.cctv,"cctv")],["🈺",grade(m.signs,"signs")],["🛟",grade(m.lifeguard,"lifeguard")],["🚑",grade(m.drill,"drill")]]
+      .map(([ic,g])=>`<span class="mchip ${g.g==="ok"?"c-ok":g.g==="warn"?"c-warn":g.g==="na"?"c-na":"c-bad"}">${ic} ${g.short}</span>`).join("");
+    const html=`<div class="popcard">
+      <div class="cover" style="background:linear-gradient(135deg,${c.g[0]},${c.g[1]})"><span class="em">${c.em}</span><b>จุดตรวจที่ ${c.no} • ${c.name}</b></div>
+      <div class="body">
+        <div class="amp">อ.${c.amp} ${c.rate?`• ★ ${c.rate} รีวิว Google`:""}</div>
+        <div class="bar"><i style="width:${clamp(p,0,100)}%;background:${st.c}"></i></div>
+        <div class="nums"><span>ผลตรวจสะสม <b>${fmt(got)}</b> ครั้ง</span><span>เป้า <b>${fmt(c.target)}</b> (${p.toFixed(0)}%)</span></div>
+        <div class="chips">${chips}</div>
+        <div style="font-size:.76rem;color:var(--mut);line-height:1.55">${c.desc}</div>
+        <div class="acts">
+          <a class="a-nav" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=${c.lat},${c.lng}">🧭 นำทาง</a>
+          <a class="a-food" target="_blank" rel="noopener" href="https://www.google.com/maps/search/ร้านอาหาร/@${c.lat},${c.lng},15z">🍜 ร้านใกล้เคียง</a>
+        </div>
+      </div></div>`;
+    const mk=L.marker([c.lat,c.lng],{icon}).addTo(map).bindPopup(html,{maxWidth:290});
+    markers.push(mk);
+  });
+}
+
+/* ── ATTRACTION CARDS ── */
+function renderCards(pace){
+  $("attrScroll").innerHTML=CPS.map(c=>{
+    const got=sumPatrols("ALL",c.id), p=got/c.target*100, st=statusOf(p,pace);
+    const detail=c.pid?`https://www.google.com/maps/search/?api=1&query=${c.lat},${c.lng}&query_place_id=${c.pid}`:`https://www.google.com/maps/search/?api=1&query=${c.lat},${c.lng}`;
+    return `<article class="acard">
+      <div class="cov" style="background:linear-gradient(140deg,${c.g[0]},${c.g[1]})">
+        <span class="no">จุดตรวจที่ ${c.no} • ${c.type}</span><span class="em">${c.em}</span><b>${c.name}</b>
+      </div>
+      <div class="bd">
+        <div><span class="amp">อ.${c.amp}</span>${c.rate?`<span class="rate">★ ${c.rate}</span>`:""}</div>
+        <p>${c.desc}</p>
+        <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px">${c.hi.map(h=>`<span class="mchip" style="background:#EAF3EF;color:var(--teal)">${h}</span>`).join("")}</div>
+        <div class="prog"><i style="width:${clamp(p,0,100)}%;background:${st.c}"></i></div>
+        <div class="pl"><span>เฝ้าระวังแล้ว <b>${fmt(got)}</b>/${fmt(c.target)} ครั้ง</span><span class="chip ${st.cls}" style="font-size:.62rem;padding:2px 8px">${st.t}</span></div>
+        <div class="acts">
+          <a class="a-nav" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=${c.lat},${c.lng}">🧭 นำทางไปเที่ยว</a>
+          <a class="a-food" target="_blank" rel="noopener" href="${detail}">📍 รายละเอียด</a>
+        </div>
+      </div></article>`;
+  }).join("");
+}
+
+/* ── CHARTS ── */
+if(typeof Chart!=="undefined"){
+  Chart.defaults.font.family="'Sarabun',sans-serif";
+  Chart.defaults.color="#5E6F69";
+}
+
+function renderCpChart(month,pace){
+  const labels=CPS.map(c=>`${c.no}. ${c.name.length>22?c.name.slice(0,21)+"…":c.name}`);
+  const vals=CPS.map(c=>sumPatrols(month,c.id));
+  const tgs=CPS.map(c=>month==="ALL"?c.target:Math.round(c.target/4));
+  const cols=CPS.map((c,i)=>{const p=vals[i]/tgs[i]*100;return statusOf(p,month==="ALL"?pace:1).c;});
+  charts.cp&&charts.cp.destroy();
+  charts.cp=new Chart($("cpChart"),{type:"bar",
+    data:{labels,datasets:[
+      {label:"ผลตรวจ (ครั้ง)",data:vals,backgroundColor:cols,borderRadius:6,barPercentage:.72},
+      {label:"เป้าหมาย",data:tgs,type:"bar",backgroundColor:"rgba(18,60,51,.10)",borderColor:"rgba(18,60,51,.35)",borderWidth:1,borderRadius:6,barPercentage:.95,grouped:false,order:2}
+    ]},
+    options:{indexAxis:"y",responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:"bottom",labels:{boxWidth:12,font:{size:11}}},
+        tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: ${fmt(ctx.raw)} ครั้ง`}}},
+      scales:{x:{grid:{color:"#EDEAE0"}},y:{grid:{display:false},ticks:{font:{size:10.5}}}}}});
+}
+
+function renderMonthChart(){
+  const act=MONTHS.map(m=>sumPatrols(m.k)||null);
+  const hist=MONTHS.map(m=>m.h);
+  charts.mo&&charts.mo.destroy();
+  charts.mo=new Chart($("monthChart"),{type:"bar",
+    data:{labels:MONTHS.map(m=>m.s),datasets:[
+      {label:"ผลตรวจปี 2569",data:act,backgroundColor:"#1B6B5A",borderRadius:8,barPercentage:.5},
+      {label:"ผลตรวจปี 2568 (ฐานเดิม)",data:hist,backgroundColor:"rgba(233,161,59,.28)",borderColor:"#E9A13B",borderWidth:1.5,borderRadius:8,barPercentage:.5},
+      {label:"เป้าเฉลี่ย/เดือน (900 ครั้ง)",data:MONTHS.map(()=>TOTAL_TARGET/4),type:"line",borderColor:"#D64545",borderDash:[7,5],borderWidth:2,pointRadius:0}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:"bottom",labels:{boxWidth:12,font:{size:11}}},
+        tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${c.raw==null?"ไม่มีข้อมูล":fmt(c.raw)+" ครั้ง"}`}}},
+      scales:{y:{beginAtZero:true,grid:{color:"#EDEAE0"}},x:{grid:{display:false}}}}});
+}
+
+function renderRace(pace){
+  const rows=CPS.map(c=>({c,got:sumPatrols("ALL",c.id)}))
+    .map(r=>({...r,p:r.got/r.c.target*100}))
+    .sort((a,b)=>b.p-a.p);
+  $("raceList").innerHTML=rows.map((r,i)=>{
+    const st=statusOf(r.p,pace);
+    return `<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px dashed var(--line)">
+      <span style="font-family:Kanit;font-weight:700;width:26px;color:${i<3?"var(--gold)":"var(--mut)"}">${i+1}</span>
+      <span style="font-size:1.05rem">${r.c.em}</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:.8rem;font-weight:600;color:var(--deep);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.c.name}</div>
+        <div class="prog" style="height:6px;background:#EDEAE0;border-radius:99px;overflow:hidden;margin-top:3px"><i style="display:block;height:100%;width:${clamp(r.p,0,100)}%;background:${st.c};border-radius:99px"></i></div>
+      </div>
+      <div style="text-align:right"><b style="font-family:Kanit;color:var(--deep)">${r.p.toFixed(0)}%</b><div style="font-size:.64rem;color:var(--mut)">${fmt(r.got)}/${fmt(r.c.target)}</div></div>
+    </div>`;}).join("");
+}
+
+function renderDonuts(){
+  const defs=[["d1","cctv"],["d2","signs"],["d3","lifeguard"],["d4","drill"]];
+  defs.forEach(([id,key])=>{
+    let ok=0,warn=0,bad=0,na=0;
+    CPS.forEach(c=>{const g=grade((DATA.measures[c.id]||{})[key],key).g;
+      if(g==="ok")ok++;else if(g==="warn")warn++;else if(g==="na")na++;else bad++;});
+    $(id+"v").textContent=ok;
+    charts[id]&&charts[id].destroy();
+    charts[id]=new Chart($(id),{type:"doughnut",
+      data:{labels:["เรียบร้อย/พร้อม","ระหว่างดำเนินการ","ยังไม่ดำเนินการ/ไม่มี","ไม่เกี่ยวข้อง/ไม่รายงาน"],
+        datasets:[{data:[ok,warn,bad,na],backgroundColor:["#2E8B57","#E9A13B","#D64545","#C9D2CD"],borderWidth:2,borderColor:"#fff"}]},
+      options:{cutout:"68%",plugins:{legend:{display:false},
+        tooltip:{callbacks:{label:c=>` ${c.label}: ${c.raw} จุด`}}}}});
+  });
+}
+
+function renderMatrix(pace){
+  $("matrixBody").innerHTML=CPS.map(c=>{
+    const got=sumPatrols("ALL",c.id), p=got/c.target*100, st=statusOf(p,pace);
+    const m=DATA.measures[c.id]||{};
+    const cell=(v,k)=>{const g=grade(v,k);
+      const cls=g.g==="ok"?"c-ok":g.g==="warn"?"c-warn":g.g==="na"?"c-na":"c-bad";
+      const tip=(k==="scam"&&m.scamDetail)?` title="${m.scamDetail.replace(/"/g,"'")}"`:"";
+      return `<td><span class="chip ${cls}"${tip}>${g.short}</span></td>`;};
+    return `<tr>
+      <td class="nm"><span class="cpn">${c.em} จุดตรวจที่ ${c.no} ${c.name}</span><div class="ampx">อ.${c.amp}${m.updated?` • อัปเดต ${m.updated}`:""}</div></td>
+      <td><span class="chip ${st.cls}">${fmt(got)} / ${fmt(c.target)} (${p.toFixed(0)}%)</span></td>
+      ${cell(m.cctv,"cctv")}${cell(m.signs,"signs")}${cell(m.lifeguard,"lifeguard")}${cell(m.drill,"drill")}${cell(m.scam,"scam")}
+    </tr>`;}).join("");
+}
+
+/* ════════════════════ LOAD ════════════════════ */
+async function load(){
+  try{
+    DATA=await jsonp({action:"getData"});
+    if(!DATA.ok) throw new Error(DATA.error||"ข้อมูลไม่ถูกต้อง");
+    $("lastUpdate").innerHTML=`<i></i>อัปเดตล่าสุด: ${DATA.serverTime}`;
+    renderAll();
+  }catch(e){
+    $("lastUpdate").innerHTML=`<i style="background:var(--bad)"></i>${e.message} — แสดงข้อมูลสาธิต`;
+    DATA=DEMO; renderAll();
+  }
+}
+$("monthSel").addEventListener("change",renderAll);
+
+/* clock */
+setInterval(()=>{
+  const n=new Date();
+  $("clock").textContent=n.toLocaleDateString("th-TH",{weekday:"short",day:"numeric",month:"short",year:"numeric"})+" • "+n.toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit",second:"2-digit"});
+},1000);
+
+/* auto refresh ทุก 5 นาที */
+setInterval(load,300000);
+
+/* ════════════════════ EXPORT ════════════════════ */
+$("btnPNG").onclick=async()=>{
+  const cv=await html2canvas($("captureRoot"),{scale:1.6,useCORS:true,backgroundColor:"#F5F2E9",windowWidth:1360});
+  const a=document.createElement("a");
+  a.download=`ความปลอดภัยนักท่องเที่ยว_นภ_${new Date().toISOString().slice(0,10)}.png`;
+  a.href=cv.toDataURL("image/png"); a.click();
+};
+$("btnPDF").onclick=async()=>{
+  const cv=await html2canvas($("captureRoot"),{scale:1.4,useCORS:true,backgroundColor:"#F5F2E9",windowWidth:1360});
+  const pdf=new jspdf.jsPDF({orientation:"p",unit:"mm",format:"a4"});
+  const w=210, h=cv.height*w/cv.width; let pos=0, page=0;
+  while(pos<h){ if(page>0)pdf.addPage();
+    pdf.addImage(cv.toDataURL("image/jpeg",.92),"JPEG",0,-pos,w,h); pos+=297; page++; }
+  pdf.save(`ความปลอดภัยนักท่องเที่ยว_นภ_${new Date().toISOString().slice(0,10)}.pdf`);
+};
+
+/* ════════════════════ TV MODE ════════════════════ */
+const TV_SECS=["sec-hero","sec-kpi","sec-map","sec-attr","sec-trend","sec-measure","sec-hotline"];
+let tvOn=false,tvIdx=0,tvTimer=null,tvTick=null;
+function tvGo(){
+  document.getElementById(TV_SECS[tvIdx]).scrollIntoView({behavior:"smooth",block:"start"});
+  let p=0; clearInterval(tvTick);
+  tvTick=setInterval(()=>{p+=100/120;$("tvProg").style.width=Math.min(p,100)+"%";},100);
+  tvIdx=(tvIdx+1)%TV_SECS.length;
+}
+$("btnTV").onclick=()=>{
+  tvOn=!tvOn; document.body.classList.toggle("tv",tvOn);
+  $("btnTV").textContent=tvOn?"⏹ หยุดนำเสนอ":"📺 โหมดนำเสนอ";
+  if(tvOn){ if(document.documentElement.requestFullscreen)document.documentElement.requestFullscreen().catch(()=>{});
+    tvIdx=0; tvGo(); tvTimer=setInterval(tvGo,12000);
+  }else{ clearInterval(tvTimer);clearInterval(tvTick);$("tvProg").style.width="0";
+    if(document.fullscreenElement)document.exitFullscreen().catch(()=>{});
+    window.scrollTo({top:0,behavior:"smooth"}); }
+};
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"&&tvOn)$("btnTV").click(); });
+
+/* PWA */
+if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(()=>{});
+
+/* ════════ ขอบเขตอำเภอ (OpenGISData-Thailand, ย่อพิกัด) ════════ */
+const NB_GEO = {"type":"FeatureCollection","features":[{"type":"Feature","properties":{"amp_th":"สุวรรณคูหา","amp_code":"3905"},"geometry":{"type":"MultiPolygon","coordinates":[[[[102.34839,17.52905],[102.36874,17.49973],[102.38511,17.45151],[102.39929,17.41461],[102.37602,17.41553],[102.36684,17.4242],[102.35304,17.42597],[102.34648,17.43208],[102.33686,17.42876],[102.32924,17.43396],[102.31643,17.43145],[102.31633,17.41982],[102.30971,17.40961],[102.29488,17.41336],[102.28395,17.42715],[102.27615,17.41763],[102.26628,17.42199],[102.25631,17.42648],[102.25567,17.44058],[102.23929,17.45861],[102.22039,17.46539],[102.20903,17.46275],[102.20703,17.47158],[102.19866,17.47408],[102.178,17.49202],[102.16119,17.49281],[102.15828,17.48582],[102.15011,17.48676],[102.13332,17.49782],[102.12729,17.49831],[102.126,17.50934],[102.13478,17.50948],[102.13927,17.52275],[102.14,17.53034],[102.13346,17.5421],[102.13492,17.55234],[102.13437,17.55951],[102.11602,17.57663],[102.11494,17.59],[102.10585,17.60835],[102.09575,17.61567],[102.08282,17.63501],[102.10423,17.64698],[102.10949,17.63887],[102.12104,17.63307],[102.12917,17.63616],[102.13178,17.64731],[102.13788,17.64868],[102.14522,17.66168],[102.16023,17.66624],[102.17227,17.66201],[102.18418,17.66785],[102.21743,17.66061],[102.24613,17.66589],[102.26277,17.65999],[102.26894,17.66485],[102.27537,17.6676],[102.29658,17.66221],[102.2868,17.67372],[102.31819,17.67879],[102.32409,17.62131],[102.32673,17.59221],[102.33365,17.5787],[102.3323,17.55458],[102.34839,17.52905]]]]}},{"type":"Feature","properties":{"amp_th":"นาวัง","amp_code":"3906"},"geometry":{"type":"MultiPolygon","coordinates":[[[[102.09391,17.25078],[102.10081,17.21323],[102.09488,17.19446],[102.08552,17.2109],[102.08177,17.23129],[102.08444,17.23661],[102.06953,17.25705],[102.05273,17.25158],[102.04282,17.26108],[102.02989,17.27067],[102.02678,17.28116],[102.01475,17.27953],[102.01673,17.28679],[102.00271,17.29576],[101.98607,17.32334],[101.99226,17.33499],[102.00971,17.33359],[102.02062,17.34125],[102.01337,17.3622],[102.01841,17.36683],[102.01793,17.37396],[102.00724,17.38545],[101.99583,17.39724],[101.98922,17.40364],[101.98703,17.4094],[101.98487,17.41486],[101.9931,17.41951],[101.98457,17.44266],[101.99193,17.45955],[101.99889,17.4564],[102.03244,17.45888],[102.05213,17.44952],[102.08278,17.46167],[102.09169,17.46427],[102.09622,17.47223],[102.1118,17.48183],[102.12026,17.46726],[102.11052,17.44892],[102.10077,17.44444],[102.09674,17.43591],[102.10323,17.41781],[102.11586,17.40396],[102.1112,17.39342],[102.10725,17.39327],[102.10987,17.39028],[102.10735,17.38463],[102.11523,17.34819],[102.11644,17.33785],[102.10657,17.33183],[102.11998,17.32234],[102.12071,17.30507],[102.12596,17.30367],[102.10588,17.28623],[102.10522,17.2631],[102.09391,17.25078]]]]}},{"type":"Feature","properties":{"amp_th":"โนนสัง","amp_code":"3903"},"geometry":{"type":"MultiPolygon","coordinates":[[[[102.60231,16.77228],[102.55051,16.78159],[102.53783,16.78463],[102.51967,16.7933],[102.49653,16.8036],[102.47897,16.80733],[102.47121,16.8025],[102.46337,16.80705],[102.45361,16.8109],[102.45358,16.8058],[102.44774,16.80285],[102.45002,16.79484],[102.44544,16.79188],[102.433,16.79473],[102.42054,16.79515],[102.40569,16.81375],[102.40534,16.82685],[102.39062,16.84722],[102.38628,16.86256],[102.39089,16.86801],[102.37717,16.87083],[102.3776,16.87543],[102.36777,16.87798],[102.37884,16.9011],[102.37456,16.90845],[102.38159,16.91146],[102.38694,16.92714],[102.40996,16.92755],[102.41823,16.96314],[102.44873,17.01506],[102.45936,17.0245],[102.47118,17.02814],[102.48522,17.02235],[102.49545,17.00394],[102.50368,17.00201],[102.52298,17.01194],[102.54496,17.01392],[102.57474,17.03269],[102.58051,17.04052],[102.60855,17.02751],[102.63827,17.00662],[102.66942,16.99367],[102.67624,16.98183],[102.67953,16.96801],[102.67104,16.94135],[102.65296,16.90493],[102.62439,16.84358],[102.61304,16.79892],[102.61499,16.77707],[102.61084,16.77128],[102.60231,16.77228]]]]}},{"type":"Feature","properties":{"amp_th":"ศรีบุญเรือง","amp_code":"3904"},"geometry":{"type":"MultiPolygon","coordinates":[[[[102.37717,16.87083],[102.39089,16.86801],[102.38628,16.86256],[102.39062,16.84722],[102.40534,16.82685],[102.40569,16.81375],[102.39161,16.81044],[102.37809,16.81735],[102.3776,16.81055],[102.36127,16.81646],[102.35063,16.83032],[102.34654,16.81719],[102.33833,16.82389],[102.33596,16.83122],[102.33967,16.83711],[102.3233,16.84651],[102.3317,16.84857],[102.33029,16.85521],[102.31605,16.85503],[102.3246,16.86743],[102.3111,16.868],[102.30193,16.8775],[102.30718,16.88417],[102.29065,16.88505],[102.29613,16.89087],[102.25465,16.89476],[102.25012,16.89148],[102.24935,16.87875],[102.24478,16.88143],[102.2421,16.87572],[102.23419,16.88017],[102.23325,16.87508],[102.22763,16.87515],[102.2257,16.86877],[102.21331,16.86138],[102.21562,16.85878],[102.21532,16.85826],[102.20362,16.86245],[102.18773,16.85803],[102.18032,16.87179],[102.17134,16.8652],[102.16755,16.87042],[102.15838,16.87172],[102.15576,16.88125],[102.14416,16.88072],[102.14417,16.87654],[102.13777,16.87906],[102.12391,16.88105],[102.10474,16.89732],[102.09677,16.89077],[102.09935,16.88202],[102.08124,16.88939],[102.07025,16.88502],[102.06942,16.88909],[102.066,16.89569],[102.0539,16.90171],[102.04567,16.90724],[102.02986,16.95048],[102.05851,16.9652],[102.06523,16.96095],[102.07175,16.96246],[102.08927,16.97883],[102.12544,16.99132],[102.13584,17.01127],[102.14085,17.01169],[102.15346,17.02741],[102.12526,17.04096],[102.11716,17.05792],[102.10797,17.06142],[102.10185,17.06972],[102.10562,17.08267],[102.09996,17.08699],[102.09913,17.10184],[102.09203,17.10318],[102.09145,17.1108],[102.07253,17.11236],[102.06539,17.12065],[102.04818,17.1238],[102.03787,17.13096],[102.02302,17.13125],[102.01639,17.13985],[102.02057,17.15405],[102.03834,17.1579],[102.04491,17.16502],[102.03231,17.17347],[102.03001,17.1921],[102.01741,17.20205],[102.02779,17.20465],[102.03766,17.22082],[102.04075,17.21102],[102.06352,17.20229],[102.08189,17.17025],[102.09293,17.17476],[102.09991,17.18053],[102.10959,17.17769],[102.12396,17.18242],[102.13071,17.17256],[102.1417,17.1766],[102.16777,17.16442],[102.18083,17.16778],[102.19202,17.15468],[102.21936,17.15071],[102.22812,17.14325],[102.22996,17.12835],[102.24223,17.13732],[102.24932,17.13555],[102.25568,17.1396],[102.27458,17.13476],[102.28214,17.12724],[102.31923,17.1178],[102.33133,17.08461],[102.33025,17.07034],[102.32263,17.05393],[102.32733,17.04357],[102.32894,17.02988],[102.32048,16.97637],[102.32148,16.96365],[102.32957,16.95551],[102.32981,16.95528],[102.34408,16.96342],[102.35719,16.94842],[102.37488,16.9523],[102.37343,16.93016],[102.38694,16.92714],[102.38159,16.91146],[102.37456,16.90845],[102.37884,16.9011],[102.36777,16.87798],[102.3776,16.87543],[102.37717,16.87083]]]]}},{"type":"Feature","properties":{"amp_th":"เมืองหนองบัวลำภู","amp_code":"3901"},"geometry":{"type":"MultiPolygon","coordinates":[[[[102.41823,16.96314],[102.40996,16.92755],[102.38694,16.92714],[102.37343,16.93016],[102.37488,16.9523],[102.35719,16.94842],[102.34408,16.96342],[102.32981,16.95528],[102.32957,16.95551],[102.32148,16.96365],[102.32048,16.97637],[102.32894,17.02988],[102.32733,17.04357],[102.32263,17.05393],[102.33025,17.07034],[102.33133,17.08461],[102.31923,17.1178],[102.28214,17.12724],[102.27458,17.13476],[102.25568,17.1396],[102.24932,17.13555],[102.24223,17.13732],[102.24513,17.14612],[102.24034,17.15144],[102.24289,17.16314],[102.27581,17.20689],[102.26987,17.22241],[102.27894,17.23917],[102.2769,17.24945],[102.24944,17.27738],[102.26138,17.28808],[102.23584,17.32494],[102.24049,17.33943],[102.24515,17.34166],[102.26553,17.31077],[102.27413,17.31403],[102.28971,17.30808],[102.29454,17.33138],[102.30421,17.33935],[102.30664,17.34918],[102.30821,17.35949],[102.3028,17.37723],[102.31479,17.36702],[102.34244,17.35987],[102.38055,17.38228],[102.42166,17.37506],[102.43782,17.33937],[102.4414,17.3223],[102.43883,17.284],[102.43867,17.28267],[102.43946,17.28046],[102.45836,17.28171],[102.4626,17.27538],[102.47827,17.27509],[102.48991,17.28427],[102.50333,17.28604],[102.52176,17.27472],[102.53665,17.25832],[102.57097,17.25512],[102.59293,17.2655],[102.57322,17.23617],[102.55182,17.23594],[102.54193,17.2171],[102.53547,17.22883],[102.52176,17.22526],[102.50364,17.19507],[102.5089,17.18169],[102.52055,17.15113],[102.52059,17.14537],[102.50694,17.13916],[102.52022,17.10032],[102.54383,17.06722],[102.58051,17.04052],[102.57474,17.03269],[102.54496,17.01392],[102.52298,17.01194],[102.50368,17.00201],[102.49545,17.00394],[102.48522,17.02235],[102.47118,17.02814],[102.45936,17.0245],[102.44873,17.01506],[102.41823,16.96314]]]]}},{"type":"Feature","properties":{"amp_th":"นากลาง","amp_code":"3902"},"geometry":{"type":"MultiPolygon","coordinates":[[[[102.24034,17.15144],[102.24513,17.14612],[102.24223,17.13732],[102.22996,17.12835],[102.22812,17.14325],[102.21936,17.15071],[102.19202,17.15468],[102.18083,17.16778],[102.16777,17.16442],[102.1417,17.1766],[102.13071,17.17256],[102.12396,17.18242],[102.10959,17.17769],[102.09991,17.18053],[102.09488,17.19446],[102.10081,17.21323],[102.09391,17.25078],[102.10522,17.2631],[102.10588,17.28623],[102.12596,17.30367],[102.12071,17.30507],[102.11998,17.32234],[102.10657,17.33183],[102.11644,17.33785],[102.11523,17.34819],[102.10735,17.38463],[102.10987,17.39028],[102.10725,17.39327],[102.1112,17.39342],[102.11586,17.40396],[102.10323,17.41781],[102.09674,17.43591],[102.10077,17.44444],[102.11052,17.44892],[102.12026,17.46726],[102.1118,17.48183],[102.12856,17.49221],[102.12729,17.49831],[102.13332,17.49782],[102.15011,17.48676],[102.15828,17.48582],[102.16119,17.49281],[102.178,17.49202],[102.19866,17.47408],[102.20703,17.47158],[102.20903,17.46275],[102.22039,17.46539],[102.23929,17.45861],[102.25567,17.44058],[102.25631,17.42648],[102.26628,17.42199],[102.27615,17.41763],[102.28395,17.42715],[102.29488,17.41336],[102.30971,17.40961],[102.31633,17.41982],[102.31643,17.43145],[102.32924,17.43396],[102.33686,17.42876],[102.34648,17.43208],[102.35304,17.42597],[102.36684,17.4242],[102.37602,17.41553],[102.39929,17.41461],[102.40592,17.40132],[102.42166,17.37506],[102.38055,17.38228],[102.34244,17.35987],[102.31479,17.36702],[102.3028,17.37723],[102.30821,17.35949],[102.30664,17.34918],[102.30421,17.33935],[102.29454,17.33138],[102.28971,17.30808],[102.27413,17.31403],[102.26553,17.31077],[102.24515,17.34166],[102.24049,17.33943],[102.23584,17.32494],[102.26138,17.28808],[102.24944,17.27738],[102.2769,17.24945],[102.27894,17.23917],[102.26987,17.22241],[102.27581,17.20689],[102.24289,17.16314],[102.24034,17.15144]]]]}}]};
+
+load();
+</script>
+</body>
+</html>
