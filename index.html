@@ -51,7 +51,9 @@ select.tb-btn option{color:var(--ink)}
 
 /* ================= HERO ================= */
 .hero{position:relative;overflow:hidden;color:#fff;
-  background:linear-gradient(180deg,#0B2A24 0%,#123C33 34%,#1B6B5A 72%,#2E8B74 100%)}
+  background:linear-gradient(180deg,rgba(9,33,28,.92) 0%,rgba(14,48,41,.86) 38%,rgba(20,74,62,.78) 70%,rgba(27,94,78,.72) 100%),
+    url("hero_bg.jpg") center 32%/cover no-repeat;background-color:#0B2A24}
+.hero .photo-credit{position:absolute;right:14px;bottom:10px;z-index:3;font-size:.62rem;color:rgba(255,255,255,.55);letter-spacing:.05em}
 .hero::before{content:"";position:absolute;inset:0;
   background:radial-gradient(1200px 500px at 50% 118%,rgba(233,161,59,.35),transparent 62%);pointer-events:none}
 .hero-in{max-width:1280px;margin:0 auto;padding:38px 24px 0;display:grid;grid-template-columns:1.05fr .95fr;gap:26px;align-items:center;position:relative;z-index:2}
@@ -216,9 +218,82 @@ body.tv #tvBar{display:block}
   section{padding:34px 0 6px}
 }
 @media print{.topbar,.legend,#tvBar{display:none}}
+
+/* ================= LOADER ================= */
+#loader{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:linear-gradient(180deg,#0B2A24 0%,#123C33 55%,#1B6B5A 100%);transition:opacity .6s,visibility .6s}
+#loader.off{opacity:0;visibility:hidden;pointer-events:none}
+#loader .ring{position:relative;width:150px;height:150px;display:flex;align-items:center;justify-content:center}
+#loader .ring::before{content:"";position:absolute;inset:-12px;border-radius:50%;
+  border:3px solid transparent;border-top-color:var(--gold);border-right-color:rgba(233,161,59,.35);
+  animation:spin 1.3s linear infinite}
+#loader .ring::after{content:"";position:absolute;inset:-26px;border-radius:50%;
+  border:1.5px dashed rgba(245,200,119,.35);animation:spin 8s linear infinite reverse}
+#loader img{width:112px;height:112px;object-fit:contain;border-radius:50%;background:#fff;padding:6px;
+  box-shadow:0 0 44px rgba(233,161,59,.45),0 0 90px rgba(233,161,59,.18);animation:pulse 2.2s ease-in-out infinite}
+#loader h3{font-family:'Kanit';font-weight:600;font-size:1.12rem;color:#fff;margin-top:30px;letter-spacing:.02em}
+#loader p{font-family:'Sarabun';font-size:.82rem;color:#BFD9CF;margin-top:6px}
+#loader .dots i{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--gold);margin:0 3px;animation:bounce 1.2s infinite}
+#loader .dots i:nth-child(2){animation-delay:.15s}#loader .dots i:nth-child(3){animation-delay:.3s}
+#loader .mtn{position:absolute;bottom:0;left:0;right:0;height:120px;opacity:.5}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.045)}}
+@keyframes bounce{0%,100%{transform:translateY(0);opacity:.5}50%{transform:translateY(-7px);opacity:1}}
+
+/* ================= DRILLDOWN MODAL ================= */
+.dd-back{position:fixed;inset:0;z-index:9000;background:rgba(11,42,36,.62);backdrop-filter:blur(3px);
+  display:none;align-items:flex-start;justify-content:center;padding:4vh 16px;overflow-y:auto}
+.dd-back.on{display:flex;animation:fade .2s}
+.dd{background:var(--paper);width:100%;max-width:760px;border-radius:20px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.4);margin-bottom:6vh}
+.dd-cov{position:relative;color:#fff;padding:26px 28px 20px;display:flex;align-items:flex-end;gap:16px;min-height:130px}
+.dd-cov .em{font-size:3rem;filter:drop-shadow(0 4px 8px rgba(0,0,0,.3))}
+.dd-cov .t small{display:block;font-family:'Kanit';font-size:.72rem;letter-spacing:.12em;opacity:.85;text-transform:uppercase}
+.dd-cov .t b{font-family:'Kanit';font-weight:600;font-size:1.3rem;line-height:1.3}
+.dd-cov .x{position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:50%;border:none;
+  background:rgba(0,0,0,.28);color:#fff;font-size:1rem;cursor:pointer}
+.dd-cov .x:hover{background:rgba(0,0,0,.5)}
+.dd-bd{padding:22px 26px 26px}
+.dd-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:16px}
+.dd-k{background:#fff;border-radius:12px;padding:12px 14px;box-shadow:0 4px 14px rgba(18,60,51,.06)}
+.dd-k b{display:block;font-family:'Kanit';font-size:1.3rem;color:var(--deep)}
+.dd-k span{font-size:.68rem;color:var(--mut)}
+.dd h4{font-family:'Kanit';font-weight:600;font-size:.92rem;color:var(--deep);margin:18px 0 10px;display:flex;align-items:center;gap:8px}
+.dd-ms{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.dd-m{background:#fff;border-radius:12px;padding:11px 13px;font-size:.76rem;line-height:1.5;box-shadow:0 4px 12px rgba(18,60,51,.05)}
+.dd-m b{display:flex;align-items:center;gap:6px;font-family:'Kanit';font-weight:500;font-size:.74rem;color:var(--deep);margin-bottom:4px}
+.dd-scam{background:#FDF0F0;border:1px solid #F1C4C4;border-radius:12px;padding:12px 15px;font-size:.8rem;color:#8E3030;line-height:1.6}
+.dd-tbl{max-height:280px;overflow-y:auto;background:#fff;border-radius:12px;box-shadow:0 4px 12px rgba(18,60,51,.05)}
+.dd-tbl table{width:100%;border-collapse:collapse;font-size:.78rem}
+.dd-tbl th{position:sticky;top:0;background:var(--deep);color:#fff;font-family:'Kanit';font-weight:500;font-size:.7rem;padding:8px 10px;text-align:left}
+.dd-tbl td{padding:7px 10px;border-bottom:1px solid var(--line)}
+.dd-acts{display:flex;gap:9px;flex-wrap:wrap;margin-top:18px}
+.dd-acts a{flex:1;min-width:140px;text-align:center;text-decoration:none;font-family:'Kanit';font-size:.8rem;
+  border-radius:11px;padding:11px 10px;transition:.15s}
+.dd-a1{background:var(--deep);color:#fff}.dd-a1:hover{background:var(--teal)}
+.dd-a2{background:var(--gold);color:var(--deep2)}.dd-a2:hover{background:var(--gold2)}
+.dd-a3{background:#fff;color:var(--deep);border:1.5px solid var(--line)}.dd-a3:hover{border-color:var(--teal)}
+.clickable{cursor:pointer}
+tr.clickable:hover td{background:#EFF6F2!important}
+@media(max-width:640px){.dd-ms{grid-template-columns:1fr}.dd-cov .t b{font-size:1.05rem}}
+
 </style>
 </head>
 <body>
+
+<!-- ═══════════ LOADER ═══════════ -->
+<div id="loader">
+  <div class="ring"><img src="ตราหนองบัวลำภู.png" alt="ตราประจำจังหวัดหนองบัวลำภู" onerror="this.style.display='none'"></div>
+  <h3>เที่ยวปลอดภัย หนองบัวลำภู</h3>
+  <p>กำลังเชื่อมต่อฐานข้อมูลปฏิบัติการ 12 จุดตรวจ</p>
+  <div class="dots" style="margin-top:14px"><i></i><i></i><i></i></div>
+  <svg class="mtn" viewBox="0 0 1440 120" preserveAspectRatio="none"><path d="M0,120 L0,70 L180,25 L340,80 L520,15 L700,75 L880,30 L1060,85 L1240,40 L1440,90 L1440,120 Z" fill="#F5F2E9" opacity=".16"/><path d="M0,120 L0,95 L220,55 L420,100 L640,45 L860,95 L1080,60 L1300,100 L1440,70 L1440,120 Z" fill="#F5F2E9" opacity=".28"/></svg>
+</div>
+
+<!-- ═══════════ DRILLDOWN MODAL ═══════════ -->
+<div class="dd-back" id="ddBack" onclick="if(event.target===this)closeDd()">
+  <div class="dd" id="ddBox"></div>
+</div>
+
 
 <!-- ═══════════ TOP BAR ═══════════ -->
 <header class="topbar" id="topbar">
@@ -379,7 +454,7 @@ body.tv #tvBar{display:block}
   <div class="sec-head">
     <span class="tag">4 Measures Tracking</span>
     <h2>สถานะความพร้อมตามมาตรการ</h2>
-    <p>ข้อมูลสถานะล่าสุดจากเจ้าหน้าที่ประจำจุดตรวจ (แก้ไขปรับปรุงได้แบบเรียลไทม์ผ่านระบบกรอกข้อมูล)</p>
+    <p>ข้อมูลสถานะล่าสุดจากเจ้าหน้าที่ประจำจุดตรวจ (เรียลไทม์) — 🔍 <b>คลิกที่แถวจุดตรวจใดก็ได้</b>เพื่อเปิดรายละเอียดเชิงลึก: ผลตรวจรายเดือน สถานะทุกมาตรการ รายละเอียดเหตุมิจฉาชีพ และบันทึกย้อนหลังทุกรายการ</p>
   </div>
   <div class="don-grid" id="donGrid">
     <div class="don"><h3>📹 CCTV / ไฟส่องสว่าง 24 ชม.<br>(มาตรการ 1.2)</h3><div class="cv"><canvas id="d1"></canvas><div class="mid"><b id="d1v">–</b><span>จาก 12 จุด</span></div></div></div>
@@ -428,7 +503,7 @@ body.tv #tvBar{display:block}
 /* ════════════════════════════════════════════════════════════
    CONFIG — แก้ค่าที่นี่จุดเดียว
    ════════════════════════════════════════════════════════════ */
-const GAS_URL = "";      // ← วาง URL Web App (/exec) จาก Apps Script; เว้นว่าง = โหมดสาธิต
+const GAS_URL = "https://script.google.com/macros/s/AKfycbwk0XBb0BA9fttidQUiH-9XfHp-Qbw9eEOt6yH4n4KYa6rszXpHuYI1uzI5ZxhEnSAAVQ/exec";
 const PERIOD  = { start: "2026-06-01", end: "2026-09-30", label: "มิ.ย. – ก.ย. 2569" };
 const TOTAL_TARGET = 3600;
 
@@ -676,6 +751,7 @@ function renderMap(month,pace){
         <div class="acts">
           <a class="a-nav" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=${c.lat},${c.lng}">🧭 นำทาง</a>
           <a class="a-food" target="_blank" rel="noopener" href="https://www.google.com/maps/search/ร้านอาหาร/@${c.lat},${c.lng},15z">🍜 ร้านใกล้เคียง</a>
+          <a class="a-nav" style="background:var(--gold);color:var(--deep2)" href="javascript:openDd('${c.id}')">📈 ผลงานจุดนี้</a>
         </div>
       </div></div>`;
     const mk=L.marker([c.lat,c.lng],{icon}).addTo(map).bindPopup(html,{maxWidth:290});
@@ -697,7 +773,7 @@ function renderCards(pace){
         <p>${c.desc}</p>
         <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px">${c.hi.map(h=>`<span class="mchip" style="background:#EAF3EF;color:var(--teal)">${h}</span>`).join("")}</div>
         <div class="prog"><i style="width:${clamp(p,0,100)}%;background:${st.c}"></i></div>
-        <div class="pl"><span>เฝ้าระวังแล้ว <b>${fmt(got)}</b>/${fmt(c.target)} ครั้ง</span><span class="chip ${st.cls}" style="font-size:.62rem;padding:2px 8px">${st.t}</span></div>
+        <div class="pl clickable" onclick="openDd('${c.id}')" title="คลิกดูผลการดำเนินงานเชิงลึก"><span>เฝ้าระวังแล้ว <b>${fmt(got)}</b>/${fmt(c.target)} ครั้ง</span><span class="chip ${st.cls}" style="font-size:.62rem;padding:2px 8px">${st.t} 🔍</span></div>
         <div class="acts">
           <a class="a-nav" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=${c.lat},${c.lng}">🧭 นำทางไปเที่ยว</a>
           <a class="a-food" target="_blank" rel="noopener" href="${detail}">📍 รายละเอียด</a>
@@ -751,7 +827,7 @@ function renderRace(pace){
     .sort((a,b)=>b.p-a.p);
   $("raceList").innerHTML=rows.map((r,i)=>{
     const st=statusOf(r.p,pace);
-    return `<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px dashed var(--line)">
+    return `<div class="clickable" onclick="openDd('${r.c.id}')" title="คลิกดูรายละเอียดเชิงลึก" style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px dashed var(--line)">
       <span style="font-family:Kanit;font-weight:700;width:26px;color:${i<3?"var(--gold)":"var(--mut)"}">${i+1}</span>
       <span style="font-size:1.05rem">${r.c.em}</span>
       <div style="flex:1;min-width:0">
@@ -786,12 +862,78 @@ function renderMatrix(pace){
       const cls=g.g==="ok"?"c-ok":g.g==="warn"?"c-warn":g.g==="na"?"c-na":"c-bad";
       const tip=(k==="scam"&&m.scamDetail)?` title="${m.scamDetail.replace(/"/g,"'")}"`:"";
       return `<td><span class="chip ${cls}"${tip}>${g.short}</span></td>`;};
-    return `<tr>
-      <td class="nm"><span class="cpn">${c.em} จุดตรวจที่ ${c.no} ${c.name}</span><div class="ampx">อ.${c.amp}${m.updated?` • อัปเดต ${m.updated}`:""}</div></td>
+    return `<tr class="clickable" onclick="openDd('${c.id}')" title="คลิกดูรายละเอียดเชิงลึก">
+      <td class="nm"><span class="cpn">${c.em} จุดตรวจที่ ${c.no} ${c.name}</span><div class="ampx">อ.${c.amp}${m.updated?` • อัปเดต ${m.updated}`:""} • 🔍 คลิกดูรายละเอียด</div></td>
       <td><span class="chip ${st.cls}">${fmt(got)} / ${fmt(c.target)} (${p.toFixed(0)}%)</span></td>
       ${cell(m.cctv,"cctv")}${cell(m.signs,"signs")}${cell(m.lifeguard,"lifeguard")}${cell(m.drill,"drill")}${cell(m.scam,"scam")}
     </tr>`;}).join("");
 }
+
+
+/* ════════════════════ DRILLDOWN รายจุด ════════════════════ */
+function measureFull(v,k){
+  const g=grade(v,k);
+  const cls=g.g==="ok"?"c-ok":g.g==="warn"?"c-warn":g.g==="na"?"c-na":"c-bad";
+  return `<span class="chip ${cls}" style="font-size:.66rem;padding:2px 9px">${g.short}</span><div style="margin-top:4px;color:var(--mut)">${v||"ยังไม่รายงานสถานะ"}</div>`;
+}
+window.openDd=function(cpId){
+  const c=CPS.find(x=>x.id===cpId); if(!c)return;
+  const pace=paceRatio();
+  const got=sumPatrols("ALL",c.id), p=got/c.target*100, st=statusOf(p,pace);
+  const m=DATA.measures[c.id]||{};
+  const recs=DATA.patrols.filter(x=>x.cp===c.id).sort((a,b)=>String(b.date+(b.id||"")).localeCompare(a.date+(a.id||"")));
+  const nMonths={};recs.forEach(r=>{nMonths[r.month]=(nMonths[r.month]||0)+Number(r.count||0);});
+  const moRows=Object.keys(nMonths).sort().map(k=>`<span class="mchip" style="background:#EAF3EF;color:var(--teal)">${monthLabel(k)}: <b>${fmt(nMonths[k])}</b> ครั้ง</span>`).join(" ")||'<span style="color:var(--mut);font-size:.76rem">ยังไม่มีการบันทึกผลตรวจ</span>';
+  const scamBox=(m.scam&&m.scam.indexOf("พบเหตุการณ์")>-1)
+    ?`<h4>⚠️ เหตุมิจฉาชีพ/หลอกลวงนักท่องเที่ยว (มาตรการ 4)</h4>
+       <div class="dd-scam"><b style="font-family:Kanit">สถานะ: พบเหตุการณ์ — อยู่ระหว่างติดตาม</b><br>${(m.scamDetail||"ไม่ได้ระบุรายละเอียด").replace(/</g,"&lt;")}</div>`
+    :`<h4>⚠️ เหตุมิจฉาชีพ/หลอกลวง (มาตรการ 4)</h4>
+       <div class="dd-m" style="color:var(--ok)"><b>✅ ${m.scam||"ยังไม่รายงานสถานะประจำเดือน"}</b>${m.scam?"ไม่พบเหตุการณ์ในรอบรายงานล่าสุด":""}</div>`;
+  const rows=recs.slice(0,40).map(r=>`<tr><td>${r.date}</td><td style="text-align:center;font-family:Kanit;font-weight:600">${fmt(r.count)}</td><td style="color:var(--mut)">${(r.note||"—").replace(/</g,"&lt;")}</td><td style="font-size:.7rem">${r.by||""}</td></tr>`).join("")
+    ||`<tr><td colspan="4" style="text-align:center;color:var(--mut);padding:16px">ยังไม่มีรายการบันทึก</td></tr>`;
+  const detail=c.pid?`https://www.google.com/maps/search/?api=1&query=${c.lat},${c.lng}&query_place_id=${c.pid}`:`https://www.google.com/maps/search/?api=1&query=${c.lat},${c.lng}`;
+  $("ddBox").innerHTML=`
+    <div class="dd-cov" style="background:linear-gradient(135deg,${c.g[0]},${c.g[1]})">
+      <button class="x" onclick="closeDd()">✕</button>
+      <span class="em">${c.em}</span>
+      <div class="t"><small>จุดตรวจที่ ${c.no} • อ.${c.amp} ${c.rate?"• ★ "+c.rate:""}</small><b>${c.name}</b></div>
+    </div>
+    <div class="dd-bd">
+      <div class="dd-kpis">
+        <div class="dd-k"><b>${fmt(got)}</b><span>ผลตรวจสะสม (ครั้ง)</span></div>
+        <div class="dd-k"><b>${fmt(c.target)}</b><span>เป้าหมายทั้งห้วง</span></div>
+        <div class="dd-k"><b style="color:${st.c}">${p.toFixed(1)}%</b><span>ความคืบหน้า</span></div>
+        <div class="dd-k"><b><span class="chip ${st.cls}" style="font-size:.72rem">${st.t}</span></b><span>สถานะเทียบแผน</span></div>
+      </div>
+      <div class="prog" style="height:10px;background:#EDEAE0;border-radius:99px;overflow:hidden"><i style="display:block;height:100%;width:${clamp(p,0,100)}%;background:${st.c};border-radius:99px"></i></div>
+      <h4>📆 ผลตรวจรายเดือน</h4>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">${moRows}</div>
+      <h4>📋 สถานะมาตรการ ${m.updated?`<small style="font-family:Sarabun;font-weight:400;color:var(--mut)">อัปเดตล่าสุด ${m.updated}${m.by?" โดย "+m.by:""}</small>`:""}</h4>
+      <div class="dd-ms">
+        <div class="dd-m"><b>📹 CCTV / ไฟส่องสว่าง (ม.1.2)</b>${measureFull(m.cctv,"cctv")}</div>
+        <div class="dd-m"><b>🈺 ป้าย 3 ภาษา (ม.2.1)</b>${measureFull(m.signs,"signs")}</div>
+        <div class="dd-m"><b>🛟 ไลฟ์การ์ด/อุปกรณ์ช่วยชีวิต (ม.2.1)</b>${measureFull(m.lifeguard,"lifeguard")}</div>
+        <div class="dd-m"><b>🚑 ซักซ้อมแผนเผชิญเหตุ (ม.3.2)</b>${measureFull(m.drill,"drill")}</div>
+      </div>
+      ${scamBox}
+      <h4>🕓 บันทึกผลตรวจล่าสุด <small style="font-family:Sarabun;font-weight:400;color:var(--mut)">(${fmt(recs.length)} รายการ • แสดง 40 ล่าสุด)</small></h4>
+      <div class="dd-tbl"><table>
+        <thead><tr><th>วันที่</th><th style="text-align:center">จำนวน (ครั้ง)</th><th>หมายเหตุ</th><th>ผู้บันทึก</th></tr></thead>
+        <tbody>${rows}</tbody></table></div>
+      <div class="dd-acts">
+        <a class="dd-a1" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=${c.lat},${c.lng}">🧭 นำทางไปจุดนี้</a>
+        <a class="dd-a2" target="_blank" rel="noopener" href="${detail}">📍 ดูรายละเอียดสถานที่</a>
+        <a class="dd-a3" target="_blank" rel="noopener" href="https://www.google.com/maps/search/ร้านอาหาร/@${c.lat},${c.lng},15z">🍜 ร้านอาหารใกล้เคียง</a>
+      </div>
+    </div>`;
+  $("ddBack").classList.add("on");
+  document.body.style.overflow="hidden";
+};
+window.closeDd=function(){$("ddBack").classList.remove("on");document.body.style.overflow="";};
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeDd();});
+
+/* loader */
+function hideLoader(){const l=$("loader");if(l)l.classList.add("off");}
 
 /* ════════════════════ LOAD ════════════════════ */
 async function load(){
@@ -799,10 +941,10 @@ async function load(){
     DATA=await jsonp({action:"getData"});
     if(!DATA.ok) throw new Error(DATA.error||"ข้อมูลไม่ถูกต้อง");
     $("lastUpdate").innerHTML=`<i></i>อัปเดตล่าสุด: ${DATA.serverTime}`;
-    renderAll();
+    renderAll(); hideLoader();
   }catch(e){
     $("lastUpdate").innerHTML=`<i style="background:var(--bad)"></i>${e.message} — แสดงข้อมูลสาธิต`;
-    DATA=DEMO; renderAll();
+    DATA=DEMO; renderAll(); hideLoader();
   }
 }
 $("monthSel").addEventListener("change",renderAll);
@@ -844,6 +986,8 @@ function tvGo(){
 $("btnTV").onclick=()=>{
   tvOn=!tvOn; document.body.classList.toggle("tv",tvOn);
   $("btnTV").textContent=tvOn?"⏹ หยุดนำเสนอ":"📺 โหมดนำเสนอ";
+  try{ if(tvOn) document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();
+       else document.fullscreenElement&&document.exitFullscreen(); }catch(e){}
   if(tvOn){ if(document.documentElement.requestFullscreen)document.documentElement.requestFullscreen().catch(()=>{});
     tvIdx=0; tvGo(); tvTimer=setInterval(tvGo,12000);
   }else{ clearInterval(tvTimer);clearInterval(tvTick);$("tvProg").style.width="0";

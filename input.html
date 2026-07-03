@@ -87,6 +87,22 @@ tr:nth-child(even) td{background:#FBFAF4}
 .bar{height:10px;background:#EDEAE0;border-radius:99px;overflow:hidden;margin-top:12px;display:none}
 .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--teal),var(--gold));border-radius:99px;transition:width .3s}
 @media(max-width:640px){.wrap{padding:16px 12px 50px}.card{padding:18px}}
+
+/* record detail modal */
+.rd-back{position:fixed;inset:0;z-index:9000;background:rgba(11,42,36,.6);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;padding:16px}
+.rd-back.on{display:flex;animation:fade .2s}
+.rd{background:#fff;width:100%;max-width:480px;border-radius:18px;overflow:hidden;box-shadow:0 30px 70px rgba(0,0,0,.35)}
+.rd-h{background:var(--deep);color:#fff;padding:16px 20px;display:flex;align-items:center;gap:10px}
+.rd-h b{font-family:'Kanit';font-weight:600;font-size:.95rem;flex:1}
+.rd-h button{border:none;background:rgba(255,255,255,.15);color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer}
+.rd-b{padding:20px 22px}
+.rd-row{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px dashed var(--line);font-size:.85rem}
+.rd-row span{color:var(--mut);font-size:.76rem;font-family:'Kanit')}
+.rd-row b{text-align:right;color:var(--deep)}
+.rd-note{background:#F7F5EC;border-radius:11px;padding:11px 14px;font-size:.82rem;color:var(--ink);line-height:1.6;margin-top:12px}
+.rd-acts{display:flex;gap:9px;margin-top:18px}
+.rd-acts button{flex:1}
+
 </style>
 </head>
 <body>
@@ -232,9 +248,18 @@ tr:nth-child(even) td{background:#FBFAF4}
 
 </div>
 
+
+<!-- record detail modal -->
+<div class="rd-back" id="rdBack" onclick="if(event.target===this)closeRd()">
+  <div class="rd">
+    <div class="rd-h"><b id="rdTitle">รายละเอียดรายการ</b><button onclick="closeRd()">✕</button></div>
+    <div class="rd-b" id="rdBody"></div>
+  </div>
+</div>
+
 <script>
 /* ═══════════ CONFIG ═══════════ */
-const GAS_URL = "";   // ← วาง URL Web App (/exec) เดียวกับ index.html; เว้นว่าง = โหมดสาธิต
+const GAS_URL = "https://script.google.com/macros/s/AKfycbwk0XBb0BA9fttidQUiH-9XfHp-Qbw9eEOt6yH4n4KYa6rszXpHuYI1uzI5ZxhEnSAAVQ/exec";
 
 const CPS=[
 {id:"CP1",no:1,name:"วัดถ้ำสุวรรณคูหา",amp:"สุวรรณคูหา",target:320},
@@ -385,14 +410,39 @@ function renderHist(){
     .sort((a,b)=>(b.date+b.id).localeCompare(a.date+a.id)).slice(0,60);
   $("histCap").textContent=(ROLE==="ADMIN"?"สิทธิ์ผู้ดูแล: จัดการได้ทุกจุดตรวจ":"แสดงเฉพาะจุดตรวจของท่าน")+" • รายการล่าสุด 60 รายการ";
   $("histBody").innerHTML=mine.length?mine.map(p=>`
-    <tr><td>${p.date}</td>
+    <tr style="cursor:pointer" onclick="viewRow('${p.id}')" title="คลิกดูรายละเอียด"><td>${p.date}</td>
     <td><span class="pill">${(CPMAP[p.cp]||{}).no||"?"}</span> ${(CPMAP[p.cp]||{}).name||p.cp}</td>
     <td style="text-align:center;font-family:Kanit;font-weight:600">${fmt(p.count)}</td>
     <td style="font-size:.78rem;color:var(--mut)">${p.note||"—"}</td>
     <td style="font-size:.75rem">${p.by||""}</td>
-    <td><button class="mini m-e" onclick="editRow('${p.id}')">แก้ไข</button><button class="mini m-d" onclick="delRow('${p.id}')">ลบ</button></td></tr>`).join("")
+    <td><button class="mini m-e" onclick="event.stopPropagation();editRow('${p.id}')">แก้ไข</button><button class="mini m-d" onclick="event.stopPropagation();delRow('${p.id}')">ลบ</button></td></tr>`).join("")
     :`<tr><td colspan="6" style="text-align:center;color:var(--mut)">ยังไม่มีข้อมูล</td></tr>`;
 }
+
+window.viewRow=id=>{
+  const p=CACHE.patrols.find(x=>x.id===id); if(!p)return;
+  const c=CPMAP[p.cp]||{};
+  const cum=CACHE.patrols.filter(x=>x.cp===p.cp&&x.date<=p.date).reduce((s,x)=>s+Number(x.count||0),0);
+  const moSum=CACHE.patrols.filter(x=>x.cp===p.cp&&x.month===p.month).reduce((s,x)=>s+Number(x.count||0),0);
+  $("rdTitle").textContent=`รายละเอียดการบันทึก • ${p.date}`;
+  $("rdBody").innerHTML=`
+    <div class="rd-row"><span>จุดตรวจ</span><b>จุดตรวจที่ ${c.no||"?"} ${c.name||p.cp} (อ.${c.amp||"-"})</b></div>
+    <div class="rd-row"><span>วันที่ปฏิบัติงาน</span><b>${p.date} (รอบเดือน ${p.month})</b></div>
+    <div class="rd-row"><span>จำนวนครั้งที่บันทึก</span><b style="font-family:Kanit;font-size:1.1rem">+${fmt(p.count)} ครั้ง</b></div>
+    <div class="rd-row"><span>ยอดสะสมของจุด ณ วันนั้น</span><b>${fmt(cum)} ครั้ง</b></div>
+    <div class="rd-row"><span>ยอดรวมรอบเดือนเดียวกัน</span><b>${fmt(moSum)} ครั้ง / เป้า ${fmt(c.target||0)} ทั้งห้วง</b></div>
+    <div class="rd-row"><span>ผู้บันทึก</span><b>${p.by||"—"}</b></div>
+    <div class="rd-row" style="border-bottom:none"><span>รหัสรายการ</span><b style="font-size:.72rem;color:var(--mut)">${p.id}</b></div>
+    ${p.note?`<div class="rd-note"><b style="font-family:Kanit;font-size:.76rem;color:var(--teal)">📝 หมายเหตุ/รายละเอียดเหตุการณ์</b><br>${String(p.note).replace(/</g,"&lt;")}</div>`:""}
+    <div class="rd-acts">
+      <button class="btn o" onclick="closeRd();editRow('${p.id}')">✏️ แก้ไขรายการ</button>
+      <button class="btn r" onclick="closeRd();delRow('${p.id}')">🗑️ ลบรายการ</button>
+    </div>`;
+  $("rdBack").classList.add("on");
+};
+window.closeRd=()=>$("rdBack").classList.remove("on");
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeRd();});
+
 window.editRow=async id=>{
   const p=CACHE.patrols.find(x=>x.id===id); if(!p)return;
   const count=prompt(`แก้ไขจำนวนครั้ง (${p.date} • ${(CPMAP[p.cp]||{}).name})`,p.count);
